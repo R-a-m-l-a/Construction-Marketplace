@@ -1,0 +1,6 @@
+<svg width="160" height="48" viewBox="0 0 160 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" rx="13" fill="#19544F"/>
+  <path d="M14 33V19.5L24 14L34 19.5V33" stroke="#F3B843" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M19 33V24H29V33M11.5 34.5H36.5" stroke="#F3B843" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="60" y="32" fill="#19544F" font-family="Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="-1.2">buildora</text>
+</svg>

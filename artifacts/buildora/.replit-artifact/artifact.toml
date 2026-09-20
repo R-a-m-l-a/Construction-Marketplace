@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Buildora"
+description = "A free-first construction discovery platform for finding materials, suppliers, and trusted professionals across Pakistan."
+version = "1.0.0"
+id = "artifacts/buildora"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20671
+
+[services.development]
+run = "pnpm --filter @workspace/buildora run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/buildora", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/buildora/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20671"
+BASE_PATH = "/"

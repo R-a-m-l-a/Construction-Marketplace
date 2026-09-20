@@ -1,0 +1,897 @@
+Build a complete, functional MVP of an original construction marketplace and professional-discovery web application for Pakistan.
+
+The product should be inspired by the general concept of construction marketplaces such as Tameer.ai, but MUST have its own brand identity, UI, text, layout, components and design. Do not copy Tameer.ai's branding, images, content, or exact UI.
+
+The goal is a REAL working prototype that I can deploy and give to 5–6 real users for testing.
+
+Do NOT build a static mockup. Core features must actually work.
+
+---
+
+# TECH STACK
+
+Use:
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+* Supabase for database and authentication
+* PostgreSQL through Supabase
+* Google Maps Platform / Google Places for real-world business discovery
+* OpenAI API for the AI assistant
+* Vercel-compatible architecture
+
+If Replit recommends a slightly different implementation that is more reliable for deployment, explain the change before making it.
+
+Keep the code modular and easy to maintain.
+
+---
+
+# PRODUCT
+
+Create an original construction platform where users can:
+
+1. Find construction materials
+2. Find construction suppliers
+3. Find contractors
+4. Find builders
+5. Find architects
+6. Find civil engineers
+7. Find interior designers
+8. Find electricians
+9. Find plumbers
+10. Find carpenters
+11. Find painters
+12. Find HVAC professionals
+13. Search nearby businesses using Google Maps/Places
+14. Ask an AI construction assistant
+15. Get basic construction cost estimates
+16. Submit project requirements
+17. Contact vendors/professionals
+
+The central user experience should be:
+
+USER NEED
+→ SEARCH
+→ FIND RELEVANT BUSINESSES/PROFESSIONALS
+→ SEE THEM ON MAP
+→ VIEW DETAILS
+→ CONTACT / GET DIRECTIONS
+→ OPTIONALLY POST A PROJECT
+
+---
+
+# BRAND
+
+Create an original temporary brand name:
+
+"Buildora"
+
+Make the name easy to change later.
+
+Create a modern construction-tech visual identity.
+
+Design should be:
+
+* Professional
+* Modern
+* Clean
+* Trustworthy
+* Mobile responsive
+* Good whitespace
+* Strong typography
+* Subtle animations
+* Not overly flashy
+* Not generic-looking AI UI
+
+Do not copy Tameer.ai's visual identity.
+
+---
+
+# MAIN NAVIGATION
+
+Create:
+
+Home
+Marketplace
+Professionals
+Projects
+AI Assistant
+Cost Calculator
+About
+
+Right side:
+
+Login
+Sign Up
+
+After authentication:
+
+Dashboard
+Profile
+Logout
+
+Make navigation fully responsive.
+
+---
+
+# HOME PAGE
+
+Create a polished homepage.
+
+Hero:
+
+"Build Better. Find Everything You Need."
+
+Supporting text:
+
+"Find construction materials, suppliers and professionals near you."
+
+Main search:
+
+"What are you looking for?"
+
+Examples:
+
+"Cement supplier near Islamabad"
+"Architect near me"
+"Tiles shop in Islamabad"
+"Contractor for 5 marla house"
+"Steel supplier near Peshawar"
+
+Buttons:
+
+Search
+Use My Location
+
+Below hero:
+
+## Construction Categories
+
+Create cards for:
+
+Cement
+Steel
+Bricks
+Sand & Crush
+Tiles
+Paint
+Electrical
+Plumbing
+Sanitary
+Doors & Windows
+Solar
+HVAC
+Hardware
+Furniture
+
+Then:
+
+## Find Professionals
+
+Architects
+Contractors
+Builders
+Civil Engineers
+Interior Designers
+Electricians
+Plumbers
+Carpenters
+Painters
+HVAC
+
+Then:
+
+## AI Construction Assistant
+
+Explain that users can ask construction questions and find relevant businesses.
+
+Button:
+
+Ask the AI Assistant
+
+Then:
+
+## Businesses Near You
+
+Show a map preview.
+
+Button:
+
+Explore Nearby
+
+---
+
+# MARKETPLACE
+
+Create a functional marketplace.
+
+Users should be able to:
+
+* Browse categories
+* Search products
+* Filter products
+* Sort results
+* Open product details
+* View supplier
+* Contact supplier
+
+Product cards:
+
+Product name
+Category
+Supplier
+Location
+Price/range if available
+Image
+Contact
+
+For initial demo data, create a SMALL set of clearly marked fictional/demo products and suppliers.
+
+Do not invent real businesses.
+
+Real-world business discovery should use Google Places.
+
+---
+
+# PROFESSIONALS
+
+Create a Professionals directory.
+
+Categories:
+
+Architect
+Civil Engineer
+Contractor
+Builder
+Interior Designer
+Electrician
+Plumber
+Carpenter
+Painter
+HVAC Technician
+Surveyor
+Project Manager
+
+Users should be able to search:
+
+"Architects in Islamabad"
+
+"Contractors near me"
+
+"Electricians in Peshawar"
+
+Each Google Places result should show, when available:
+
+Business name
+Rating
+Address
+Phone
+Website
+Opening information
+Distance
+Directions
+
+Clearly distinguish:
+
+"Google Places business"
+
+from:
+
+"Verified platform professional"
+
+Do not claim a Google Places business is registered on this platform.
+
+---
+
+# GOOGLE MAPS
+
+Google Maps is a CORE feature.
+
+Use Google Maps Platform and Google Places.
+
+Implement:
+
+* Interactive map
+* Place search
+* Nearby search
+* Place details
+* Map markers
+* User location
+* Directions
+* Location search
+
+Example:
+
+User searches:
+
+"Cement suppliers in Islamabad"
+
+The application should:
+
+1. Understand the query
+2. Search Google Places
+3. Display matching businesses
+4. Display markers on the map
+5. Display a result list
+6. Allow the user to select a result
+7. Show details
+8. Provide Directions
+9. Provide Call/Website when available
+
+Do not scrape Google Maps.
+
+Use Google's supported APIs.
+
+Do not store Google's business database permanently in Supabase.
+
+Include any required Google attribution.
+
+---
+
+# LOCATION
+
+Implement browser geolocation.
+
+When the user clicks:
+
+"Use My Location"
+
+request permission.
+
+If allowed:
+
+* Get coordinates
+* Center map
+* Search nearby businesses
+* Show relevant results
+
+If denied:
+
+Allow manual location search.
+
+Show a helpful error instead of failing silently.
+
+---
+
+# AI CONSTRUCTION ASSISTANT
+
+Build a real AI assistant using OpenAI API.
+
+The assistant should understand construction-related questions.
+
+It must have access to tools/functions.
+
+Tools:
+
+searchGooglePlaces
+searchNearbyPlaces
+getPlaceDetails
+searchMarketplace
+searchProfessionals
+calculateConstructionEstimate
+createProjectLead
+
+Example:
+
+User:
+
+"I need a cement supplier near Islamabad."
+
+The AI should use the Google Places tool.
+
+It should NOT invent businesses.
+
+Return real search results with:
+
+Name
+Rating
+Address
+Distance where available
+Call
+Directions
+Website
+
+Another example:
+
+User:
+
+"I need a contractor for a 5 marla house in Islamabad."
+
+The AI should:
+
+* Understand the requirement
+* Search relevant contractors
+* Present results
+* Offer to create a project request
+
+For general construction questions, the AI can answer without calling Google Places.
+
+Do not call external APIs unnecessarily.
+
+---
+
+# AI COST CONTROL
+
+This application is being built on a limited/free development plan.
+
+Optimize API usage.
+
+Rules:
+
+* Do not call OpenAI for simple UI operations.
+* Do not call Google Places automatically when pages load.
+* Only call Google Places after a user search/location request.
+* Do not continuously poll APIs.
+* Do not make duplicate API calls.
+* Cache appropriate results where permitted.
+* Do not create unnecessary AI agents.
+* Use a single AI assistant with a small number of tools.
+
+The goal is a useful MVP, not a massive autonomous agent.
+
+---
+
+# COST CALCULATOR
+
+Create a working construction calculator.
+
+Inputs:
+
+Location
+House size
+Unit
+Construction type
+Number of floors
+Quality level
+
+Construction type:
+
+Grey Structure
+Finishing
+Complete Construction
+
+Quality:
+
+Economy
+Standard
+Premium
+
+Return estimated:
+
+Cement
+Steel
+Bricks
+Sand
+Crush
+Estimated overall cost range
+
+Clearly label:
+
+"Approximate estimate — not a professional quotation."
+
+Keep the calculation logic in a separate module so it can be updated later.
+
+Do not use paid external price APIs for the MVP.
+
+---
+
+# PROJECT REQUESTS
+
+Create:
+
+"Post Your Project"
+
+Form:
+
+Project title
+Project type
+Location
+Property size
+Required service
+Budget
+Description
+Preferred contact method
+
+Example:
+
+"I need a contractor for a 5 marla grey-structure house in Islamabad."
+
+Save submissions to Supabase.
+
+Fields:
+
+id
+user_id
+title
+project_type
+location
+latitude
+longitude
+property_size
+service_required
+budget
+description
+status
+created_at
+
+Statuses:
+
+new
+contacted
+in_progress
+completed
+cancelled
+
+---
+
+# AUTHENTICATION
+
+Use Supabase Authentication.
+
+Support:
+
+Email signup
+Email login
+Logout
+
+User profile:
+
+Name
+Email
+Phone
+City
+Profile image
+Role
+
+Roles:
+
+customer
+vendor
+professional
+admin
+
+Use Row Level Security.
+
+Users must only be able to access their own private data.
+
+---
+
+# VENDOR / PROFESSIONAL PROFILES
+
+Allow registered vendors and professionals to create profiles.
+
+Fields:
+
+Business/professional name
+Category
+Description
+Phone
+Email
+Website
+Address
+City
+Latitude
+Longitude
+Services
+Portfolio images
+Years of experience
+
+Create public profile pages.
+
+Registered platform vendors should be clearly distinguished from Google Places results.
+
+---
+
+# VENDOR DASHBOARD
+
+Create a simple dashboard.
+
+Vendor/professional can:
+
+* Edit profile
+* Add services
+* Upload portfolio images
+* View incoming leads
+* View contact requests
+* Update lead status
+
+Do not create fake analytics.
+
+Only display data that actually exists.
+
+---
+
+# ADMIN DASHBOARD
+
+Create a simple admin dashboard.
+
+Admin can:
+
+* View users
+* View vendors
+* View professionals
+* View products
+* View project leads
+* Approve/reject platform profiles
+* Manage categories
+
+Use role-based access.
+
+Protect admin routes.
+
+---
+
+# DATABASE
+
+Use Supabase PostgreSQL.
+
+Create:
+
+profiles
+vendors
+professionals
+categories
+products
+services
+portfolio_items
+project_leads
+contact_requests
+reviews
+favorites
+
+Use UUID primary keys.
+
+Use foreign keys.
+
+Add timestamps.
+
+Add useful indexes.
+
+Implement Row Level Security.
+
+---
+
+# CONTACT
+
+For Google Places businesses:
+
+Show available:
+
+Call
+Website
+Directions
+
+For platform vendors:
+
+Show:
+
+Call
+Request Quote
+Contact
+
+Save platform contact requests in Supabase.
+
+---
+
+# RESPONSIVE DESIGN
+
+The entire app must work properly on:
+
+Desktop
+Laptop
+Tablet
+Mobile
+
+Do not merely shrink desktop layouts.
+
+Create proper mobile layouts.
+
+Maps must remain usable on mobile.
+
+---
+
+# ERROR HANDLING
+
+Every major feature needs:
+
+Loading state
+Empty state
+Error state
+Retry option where appropriate
+
+Handle:
+
+Google API unavailable
+No places found
+Location permission denied
+AI API failure
+Database failure
+Authentication failure
+Invalid form input
+
+Never show a blank screen.
+
+---
+
+# SECURITY
+
+Never expose:
+
+OpenAI API keys
+Supabase service-role key
+Private credentials
+
+Use environment variables.
+
+Validate user inputs.
+
+Use server-side authorization.
+
+Use Supabase Row Level Security.
+
+Never trust client-supplied admin roles.
+
+---
+
+# ENVIRONMENT VARIABLES
+
+Create a `.env.example`.
+
+Include placeholders for the required values, such as:
+
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+OPENAI_API_KEY
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+
+If additional Google credentials are required, document them.
+
+Never hard-code secrets.
+
+---
+
+# DEMO DATA
+
+Create a small amount of fictional demo marketplace data.
+
+Examples:
+
+Demo Cement Store
+Demo Steel Traders
+Demo Tiles Center
+
+Clearly label demo data internally.
+
+Do not represent fictional businesses as real businesses.
+
+Real businesses should come from Google Places.
+
+---
+
+# PERFORMANCE / COST
+
+Optimize for approximately 5–10 initial testers.
+
+Do not add:
+
+* Payments
+* Subscriptions
+* In-app wallet
+* Advanced analytics
+* Complex messaging
+* Live chat
+* Email automation
+* WhatsApp automation
+* Recommendation engines
+* Unnecessary third-party APIs
+
+These can be added later if the MVP proves useful.
+
+---
+
+# DEPLOYMENT
+
+Make the project compatible with Vercel.
+
+Ensure:
+
+npm run build
+
+works without errors.
+
+Do not rely on localhost-specific behavior.
+
+Document:
+
+* Local setup
+* Supabase setup
+* Google Maps setup
+* OpenAI setup
+* Environment variables
+* Vercel deployment
+
+---
+
+# DEVELOPMENT METHOD
+
+IMPORTANT:
+
+Do NOT spend all the available AI/development budget generating everything at once.
+
+Build incrementally.
+
+PHASE 1:
+Project structure
+Authentication
+Supabase
+Database
+Home page
+
+PHASE 2:
+Marketplace
+Professionals
+Search
+
+PHASE 3:
+Google Maps
+Google Places
+Location
+
+PHASE 4:
+AI assistant
+AI tool calling
+
+PHASE 5:
+Cost calculator
+Project leads
+
+PHASE 6:
+Vendor dashboard
+Admin dashboard
+
+PHASE 7:
+Security
+Responsive testing
+Production build
+
+After each phase, make sure existing functionality still works.
+
+If an external API requires configuration, stop and tell me exactly what I need to configure rather than replacing it with fake functionality.
+
+---
+
+# FINAL SUCCESS CRITERIA
+
+A real tester should be able to:
+
+1. Open the website
+2. Create an account
+3. Search construction materials
+4. Search construction professionals
+5. Search real businesses through Google Places
+6. See those businesses on Google Maps
+7. View business details
+8. Get directions
+9. Use their location
+10. Ask the AI assistant
+11. Ask the AI to find businesses
+12. Get an approximate construction estimate
+13. Submit a project request
+14. Create a vendor/professional profile
+15. View their dashboard
+
+The application must be genuinely functional.
+
+Prioritize:
+
+FUNCTIONALITY > visual complexity
+
+REAL DATA > fake data
+
+RELIABILITY > unnecessary features
+
+LOW API COST > excessive API usage
+
+Start with Phase 1 and show me what has been implemented before moving to the next phase.
