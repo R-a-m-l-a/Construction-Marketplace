@@ -4,6 +4,7 @@ import { ArrowDownRight, ArrowRight, BadgeCheck, Calculator, Check, ChevronDown,
 import { useGetDiscoveryStats, useListCategories, useListFeaturedProfessionals, useListFeaturedProducts } from "@workspace/api-client-react";
 import type { Category, ProfessionalPreview, ProductPreview } from "@workspace/api-client-react";
 import { DemoTag, LoadingCards, PageIntro, QueryError, SectionLabel, Shell } from "@/components/buildora-shell";
+import { LocationDiscovery } from "@/components/location-discovery";
 
 const fallbackCategories: Category[] = [
   { id: "cement", name: "Cement & concrete", group: "Materials", icon: "layers", description: "The foundations, literally." },
@@ -119,7 +120,7 @@ function Professionals() {
   const [term, setTerm] = useState("");
   const pros = query.data ?? [];
   const filtered = pros.filter((person) => `${person.name} ${person.category} ${person.city}`.toLowerCase().includes(term.toLowerCase()));
-  return <Shell><PageIntro eyebrow="Professionals / local network" title="The people behind the good work." body="Explore a starting list of architects, builders and specialists. Read the context, then make the call that feels right. Profiles shown here are demo content." /><section className="mx-auto max-w-[1240px] px-5 pb-20 sm:px-8"><div className="mb-8 flex items-center rounded-2xl border border-border bg-card p-3"><Search className="ml-3 size-4 text-muted-foreground" /><input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Search by name, trade or city" data-testid="input-professionals-search" className="h-11 w-full bg-transparent px-3 text-sm outline-none" /></div>{query.isLoading ? <LoadingCards count={6} /> : query.isError ? <QueryError onRetry={() => query.refetch()} /> : filtered.length ? <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{filtered.map((person) => <ProfessionalCard key={person.id} professional={person} />)}</div> : <EmptyState label="No professionals match that search yet." href="/projects" />}</section></Shell>;
+  return <Shell><PageIntro eyebrow="Professionals / local network" title="The people behind the good work." body="Explore a starting list of architects, builders and specialists. Read the context, then make the call that feels right. Profiles shown here are demo content." /><LocationDiscovery /><section className="mx-auto max-w-[1240px] px-5 pb-20 sm:px-8"><div className="mb-8 flex items-center rounded-2xl border border-border bg-card p-3"><Search className="ml-3 size-4 text-muted-foreground" /><input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Search by name, trade or city" data-testid="input-professionals-search" className="h-11 w-full bg-transparent px-3 text-sm outline-none" /></div>{query.isLoading ? <LoadingCards count={6} /> : query.isError ? <QueryError onRetry={() => query.refetch()} /> : filtered.length ? <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{filtered.map((person) => <ProfessionalCard key={person.id} professional={person} />)}</div> : <EmptyState label="No professionals match that search yet." href="/projects" />}</section></Shell>;
 }
 
 function Projects() {

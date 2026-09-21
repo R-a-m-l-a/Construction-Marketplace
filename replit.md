@@ -24,7 +24,9 @@ Buildora is a free-first construction discovery app for finding materials, profe
 
 - `artifacts/buildora/src/pages/buildora-pages.tsx` — public routes and first-phase product surfaces
 - `artifacts/buildora/src/components/buildora-shell.tsx` — shared navigation, footer, loading, error, and demo states
+- `artifacts/buildora/src/components/location-discovery.tsx` — Leaflet map, geocoding, nearby results, filters, and place detail states
 - `artifacts/api-server/src/routes/discovery.ts` — typed discovery endpoints and clearly marked fictional demo content
+- `artifacts/api-server/src/routes/locations.ts` — server-side Nominatim and Overpass adapters
 - `lib/api-spec/openapi.yaml` — source of truth for discovery API contracts
 - `artifacts/buildora/src/index.css` — Buildora visual tokens and responsive styling
 
@@ -34,10 +36,12 @@ Buildora is a free-first construction discovery app for finding materials, profe
 - The MVP is free-first: Replit-managed Clerk handles auth; paid Google Maps and OpenAI are not required for the first tester group.
 - Demo marketplace and professional records are fictional and visibly labeled; real-world discovery will use a free map/search adapter in a later phase.
 - The first phase uses typed API endpoints so the homepage and directories are not static mockups.
+- Phase 2 uses Leaflet with OpenStreetMap tiles, Nominatim for explicit text geocoding, and Overpass for explicit nearby place searches; no map or AI API keys are required.
+- Location searches are server-proxied and only run after a user search, current-location request, or explicit nearby action; map panning does not trigger external requests.
 
 ## Product
 
-Phase 1 includes a public home page, marketplace and professional directory previews, project brief preview, branded Clerk sign-in/sign-up, a protected planning desk, responsive navigation, and typed discovery API data.
+Phase 1 includes a public home page, marketplace and professional directory previews, project brief preview, branded Clerk sign-in/sign-up, a protected planning desk, responsive navigation, and typed discovery API data. Phase 2 adds real map-based nearby construction discovery with OpenStreetMap data, mobile-first controls, marker/list selection, and place detail links.
 
 ## User preferences
 
@@ -49,6 +53,8 @@ Phase 1 includes a public home page, marketplace and professional directory prev
 - Do not present fictional demo listings as real businesses.
 - Keep unauthenticated users on the public home route; authenticated users can use the planning desk.
 - Regenerate API clients after changing `lib/api-spec/openapi.yaml`.
+- Do not treat OpenStreetMap coverage as complete; omit unavailable contact fields and keep the source notice visible.
+- Respect public Nominatim/Overpass usage limits; avoid search-on-map-move behavior or polling.
 
 ## Pointers
 

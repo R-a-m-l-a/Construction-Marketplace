@@ -8,6 +8,12 @@
 
 export * from './category';
 export * from './discoveryStats';
+export * from './errorResponse';
+export * from './findNearbyPlacesParams';
+export * from './geocodeLocationParams';
 export * from './healthStatus';
+export * from './locationResult';
+export * from './nearbyPlacesResponse';
+export * from './place';
 export * from './productPreview';
 export * from './professionalPreview';

@@ -46,3 +46,69 @@ export interface DiscoveryStats {
   demoNotice: string;
 }
 
+export interface LocationResult {
+  displayName: string;
+  latitude: number;
+  longitude: number;
+  source: string;
+}
+
+export interface Place {
+  id: string;
+  name: string;
+  category: string;
+  latitude: number;
+  longitude: number;
+  /** @nullable */
+  distanceKm: number | null;
+  /** @nullable */
+  address: string | null;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  website: string | null;
+  /** @nullable */
+  osmUrl: string | null;
+}
+
+export interface NearbyPlacesResponse {
+  center: LocationResult;
+  places: Place[];
+  source: string;
+  sourceNotice: string;
+}
+
+export interface ErrorResponse {
+  error: string;
+}
+
+export type GeocodeLocationParams = {
+/**
+ * City, area, landmark, or address to search
+ * @minLength 2
+ */
+query: string;
+};
+
+export type FindNearbyPlacesParams = {
+/**
+ * @minimum -90
+ * @maximum 90
+ */
+latitude: number;
+/**
+ * @minimum -180
+ * @maximum 180
+ */
+longitude: number;
+/**
+ * @minimum 500
+ * @maximum 10000
+ */
+radiusMeters?: number;
+/**
+ * Optional Buildora category filter
+ */
+category?: string;
+};
+

@@ -390,6 +390,54 @@
     background-image: linear-gradient(hsl(var(--border) / .28) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / .28) 1px, transparent 1px);
     background-size: 28px 28px;
   }
+  .location-map .leaflet-container {
+    height: 100%;
+    min-height: 100%;
+    font-family: var(--app-font-sans);
+    background: #d8e3df;
+  }
+  .location-map .leaflet-control-zoom {
+    border: 0;
+    box-shadow: 0 8px 18px -12px hsl(var(--primary) / .7);
+  }
+  .location-map .leaflet-control-zoom a {
+    color: hsl(var(--primary));
+    border-color: hsl(var(--border));
+    background: hsl(var(--background) / .94);
+  }
+  .location-map .leaflet-control-attribution {
+    display: none;
+  }
+  .buildora-pin {
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: transparent;
+  }
+  .buildora-pin span {
+    display: block;
+    border: 2px solid hsl(var(--background));
+    box-shadow: 0 3px 8px hsl(var(--primary) / .32);
+    transform: rotate(45deg);
+  }
+  .buildora-pin--selected span,
+  .buildora-pin--user span {
+    width: 21px;
+    height: 21px;
+    border-radius: 50% 50% 50% 0;
+  }
+  .buildora-pin--selected span {
+    background: hsl(var(--accent));
+  }
+  .buildora-pin--user span {
+    background: hsl(var(--secondary));
+  }
+  .buildora-pin--place span {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: hsl(var(--primary));
+  }
   .grain::after {
     content: "";
     position: fixed;

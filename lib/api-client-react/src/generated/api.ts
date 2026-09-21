@@ -18,7 +18,12 @@ import type {
 import type {
   Category,
   DiscoveryStats,
+  ErrorResponse,
+  FindNearbyPlacesParams,
+  GeocodeLocationParams,
   HealthStatus,
+  LocationResult,
+  NearbyPlacesResponse,
   ProductPreview,
   ProfessionalPreview
 } from './api.schemas';
@@ -424,6 +429,174 @@ export function useGetDiscoveryStats<TData = Awaited<ReturnType<typeof getDiscov
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetDiscoveryStatsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGeocodeLocationUrl = (params: GeocodeLocationParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/locations/geocode?${stringifiedParams}` : `/api/locations/geocode`
+}
+
+/**
+ * @summary Find a location by text
+ */
+export const geocodeLocation = async (params: GeocodeLocationParams, options?: Parameters<typeof customFetch>[1]): Promise<LocationResult> => {
+
+  return customFetch<LocationResult>(getGeocodeLocationUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGeocodeLocationQueryKey = (params?: GeocodeLocationParams,) => {
+    return [
+    `/api/locations/geocode`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGeocodeLocationQueryOptions = <TData = Awaited<ReturnType<typeof geocodeLocation>>, TError = ErrorType<ErrorResponse>>(params: GeocodeLocationParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof geocodeLocation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGeocodeLocationQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof geocodeLocation>>> = ({ signal }) => geocodeLocation(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof geocodeLocation>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GeocodeLocationQueryResult = NonNullable<Awaited<ReturnType<typeof geocodeLocation>>>
+export type GeocodeLocationQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Find a location by text
+ */
+
+export function useGeocodeLocation<TData = Awaited<ReturnType<typeof geocodeLocation>>, TError = ErrorType<ErrorResponse>>(
+ params: GeocodeLocationParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof geocodeLocation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGeocodeLocationQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getFindNearbyPlacesUrl = (params: FindNearbyPlacesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/locations/nearby?${stringifiedParams}` : `/api/locations/nearby`
+}
+
+/**
+ * @summary Find nearby construction-related places
+ */
+export const findNearbyPlaces = async (params: FindNearbyPlacesParams, options?: Parameters<typeof customFetch>[1]): Promise<NearbyPlacesResponse> => {
+
+  return customFetch<NearbyPlacesResponse>(getFindNearbyPlacesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getFindNearbyPlacesQueryKey = (params?: FindNearbyPlacesParams,) => {
+    return [
+    `/api/locations/nearby`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getFindNearbyPlacesQueryOptions = <TData = Awaited<ReturnType<typeof findNearbyPlaces>>, TError = ErrorType<ErrorResponse>>(params: FindNearbyPlacesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof findNearbyPlaces>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getFindNearbyPlacesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof findNearbyPlaces>>> = ({ signal }) => findNearbyPlaces(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof findNearbyPlaces>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type FindNearbyPlacesQueryResult = NonNullable<Awaited<ReturnType<typeof findNearbyPlaces>>>
+export type FindNearbyPlacesQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Find nearby construction-related places
+ */
+
+export function useFindNearbyPlaces<TData = Awaited<ReturnType<typeof findNearbyPlaces>>, TError = ErrorType<ErrorResponse>>(
+ params: FindNearbyPlacesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof findNearbyPlaces>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getFindNearbyPlacesQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

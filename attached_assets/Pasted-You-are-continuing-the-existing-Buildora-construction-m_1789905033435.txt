@@ -1,0 +1,413 @@
+You are continuing the existing Buildora construction marketplace project.
+
+Phase 1 is complete and working. **Do not rebuild or redesign Phase 1. Do not replace Clerk authentication. Do not introduce paid services.**
+
+Now implement **PHASE 2 ONLY: Location + Map Discovery**.
+
+## Main Goal
+
+Build a real, functional location discovery system where a user can:
+
+1. Use their current location
+2. Search for a location manually
+3. See the selected location on an interactive map
+4. Discover nearby construction-related businesses/professionals
+5. See discovered results both on the map and in a list
+6. Open a result to see useful details
+
+This must use real location/map functionality, not a fake/static map.
+
+---
+
+## 1. Map Technology
+
+Use:
+
+* Leaflet
+* React-Leaflet if appropriate for the existing Next.js architecture
+* OpenStreetMap map tiles
+
+Do NOT use Google Maps yet.
+Do NOT require a Google Maps API key.
+Do NOT add billing-dependent services.
+
+Make sure the map works correctly with Next.js client-side rendering.
+
+Handle Leaflet's SSR/browser issues properly.
+
+---
+
+## 2. Location UI
+
+Add a clear location discovery section to the appropriate existing Buildora page.
+
+The user should see:
+
+**"Find construction services near you"**
+
+with two primary options:
+
+### Option A — Current Location
+
+Button:
+
+**📍 Use my current location**
+
+When clicked:
+
+* Request browser geolocation permission
+* Get latitude and longitude
+* Center the map on the user's location
+* Show a marker for the user's location
+* Search for nearby construction-related places
+
+If permission is denied, show a friendly message explaining that the user can search manually instead.
+
+Do not repeatedly request permission.
+
+### Option B — Search Location
+
+Provide a search input:
+
+**"Search city, area or location..."**
+
+Examples:
+
+* Islamabad
+* Peshawar
+* Hayatabad
+* Lahore
+* University Road, Peshawar
+
+When the user searches:
+
+* Geocode the location using a free OpenStreetMap-compatible geocoding service such as Nominatim
+* Get latitude and longitude
+* Center the map on the searched location
+* Show a location marker
+* Search for nearby construction-related places
+
+Do not hard-code Islamabad or any other city.
+
+---
+
+## 3. Map
+
+Create an interactive map showing:
+
+* Selected/search location
+* User location when available
+* Nearby construction-related results
+
+Allow:
+
+* Zoom
+* Pan
+* Marker clicking
+
+When a result marker is clicked, show a small popup/card containing:
+
+* Name
+* Category
+* Address if available
+* Basic contact information if available
+
+Use proper loading states.
+
+---
+
+## 4. Nearby Construction Discovery
+
+For the free-first MVP, use OpenStreetMap data where practical.
+
+Search for relevant construction-related categories such as:
+
+* Construction companies
+* Contractors
+* Architects
+* Civil engineers
+* Interior designers
+* Building material suppliers
+* Hardware stores
+* Electrical shops
+* Plumbing services
+* Paint stores
+* Sanitary stores
+* Tile stores
+* Real-estate/construction-related businesses where appropriate
+
+Use an appropriate OpenStreetMap-compatible source/query mechanism such as Overpass where suitable.
+
+IMPORTANT:
+
+Do not pretend that OpenStreetMap contains every business.
+
+If no nearby results are found, clearly tell the user:
+
+"No construction services were found nearby. Try searching another area."
+
+Do not generate fake businesses.
+
+---
+
+## 5. Results List
+
+Under or beside the map, display discovered places as cards.
+
+Each card should show whatever real information is available:
+
+* Name
+* Category
+* Distance if calculable
+* Address
+* Phone if available
+* Website if available
+* "View on map"
+* "Get directions" if practical
+
+Do not display fake phone numbers, websites, ratings, reviews, or addresses.
+
+If information is unavailable, simply don't display that field.
+
+---
+
+## 6. Search + Category Filtering
+
+Add a simple category filter above the results.
+
+Example:
+
+All
+Contractors
+Architects
+Engineers
+Material Suppliers
+Hardware
+Electrical
+Plumbing
+Interior Design
+
+The filter should actually affect the displayed results.
+
+Do not create a complicated filtering system yet.
+
+---
+
+## 7. Distance
+
+If the user's location or selected coordinates are available:
+
+Calculate approximate distance between the selected location and each result.
+
+Display something like:
+
+"1.4 km away"
+
+Use a simple geographic distance calculation such as the Haversine formula.
+
+Do not call an external routing API just to calculate distance.
+
+---
+
+## 8. Result Details
+
+When a user clicks a result:
+
+Open a useful detail view/modal/page containing:
+
+* Business/professional name
+* Category
+* Address
+* Phone if available
+* Website if available
+* Coordinates
+* Map location
+* Get Directions button/link where possible
+
+If the result came from OpenStreetMap, make it clear that the listing is sourced from OpenStreetMap data where appropriate.
+
+Do not invent missing information.
+
+---
+
+## 9. Get Directions
+
+For a selected result, provide:
+
+**Get Directions**
+
+If practical, open a directions URL using the coordinates in an external map service.
+
+Prefer a free/non-billing approach.
+
+Do not build turn-by-turn navigation.
+
+---
+
+## 10. Loading / Error / Empty States
+
+Implement proper states:
+
+### Loading
+
+"Finding construction services near you..."
+
+### Location permission denied
+
+"Location access was not allowed. You can search for a city or area instead."
+
+### No results
+
+"No construction services found in this area."
+
+### Geocoding failure
+
+"We couldn't find that location. Try a nearby city, area or landmark."
+
+### Network/API failure
+
+"Location services are temporarily unavailable. Please try again."
+
+Include a retry option where appropriate.
+
+---
+
+## 11. Mobile Experience
+
+The location feature must work well on mobile.
+
+On small screens:
+
+* Search/location controls first
+* Map next
+* Results below the map
+
+On desktop:
+
+* Map and results can be displayed side-by-side if the layout works well.
+
+Do not make the map unusably small.
+
+---
+
+## 12. Existing Buildora Architecture
+
+Before changing anything:
+
+Inspect the existing project and reuse the current:
+
+* Next.js structure
+* TypeScript setup
+* Tailwind styling
+* Clerk authentication
+* Existing components
+* Existing API patterns
+* Existing design system
+
+Do not unnecessarily rewrite existing files.
+
+Keep Phase 1 functionality working.
+
+---
+
+## 13. API / Data Layer
+
+Keep external location/data calls behind server-side API routes where appropriate.
+
+Do not expose unnecessary API secrets in the browser.
+
+Use TypeScript types for:
+
+* Location
+* Coordinates
+* Place
+* Category
+* Search response
+
+Keep the architecture clean so that Google Places or another provider could be added later without rewriting the entire UI.
+
+---
+
+## 14. Important Free-Tier Rules
+
+This is an early MVP for approximately 5–6 real testers.
+
+Do NOT add:
+
+* Google Maps billing
+* Paid map providers
+* Paid geocoding
+* Paid search APIs
+* AI API calls
+* Payments
+* Subscriptions
+
+Avoid excessive requests to public OpenStreetMap services.
+
+Debounce location search where appropriate.
+
+Do not automatically make repeated API requests every time the map moves.
+
+Only search nearby places when:
+
+* The user selects a location
+* The user searches for a location
+* The user explicitly requests nearby results
+
+Respect the usage policies/rate limits of any public OpenStreetMap service used.
+
+---
+
+## 15. Do NOT Implement Yet
+
+Stop after Phase 2.
+
+Do NOT implement:
+
+* AI assistant
+* Construction cost calculator
+* Project lead submission backend
+* Vendor dashboard
+* Professional dashboard
+* Reviews
+* Payments
+* Messaging
+* WhatsApp
+* Notifications
+* Admin management
+
+Those will come later.
+
+---
+
+## 16. Testing Requirements
+
+Before declaring Phase 2 complete, test:
+
+1. Search Islamabad
+2. Search Peshawar
+3. Search a smaller area/neighborhood
+4. Use current location
+5. Deny location permission
+6. Search an invalid location
+7. Search with no nearby construction results
+8. Click map markers
+9. Click result cards
+10. Use category filters
+11. Test mobile layout
+12. Refresh the page
+13. Verify Phase 1 navigation and authentication still work
+14. Run the production build
+
+Fix any errors you encounter.
+
+At the end, give me a concise report containing:
+
+* What was implemented
+* Which files/components were changed
+* Which external services are being used
+* Whether any API keys are required
+* What I should manually test
+* Any limitations of OpenStreetMap data
+
+STOP after Phase 2. Do not start Phase 3 automatically.

@@ -73,3 +73,68 @@ export const GetDiscoveryStatsResponse = zod.object({
 })
 
 
+/**
+ * @summary Find a location by text
+ */
+export const geocodeLocationQueryQueryMin = 2;
+
+
+
+export const GeocodeLocationQueryParams = zod.object({
+  "query": zod.coerce.string().min(geocodeLocationQueryQueryMin).describe('City, area, landmark, or address to search')
+})
+
+export const GeocodeLocationResponse = zod.object({
+  "displayName": zod.string(),
+  "latitude": zod.number(),
+  "longitude": zod.number(),
+  "source": zod.string()
+})
+
+
+/**
+ * @summary Find nearby construction-related places
+ */
+export const findNearbyPlacesQueryLatitudeMin = -90;
+export const findNearbyPlacesQueryLatitudeMax = 90;
+
+export const findNearbyPlacesQueryLongitudeMin = -180;
+export const findNearbyPlacesQueryLongitudeMax = 180;
+
+export const findNearbyPlacesQueryRadiusMetersDefault = 5000;
+export const findNearbyPlacesQueryRadiusMetersMin = 500;
+export const findNearbyPlacesQueryRadiusMetersMax = 10000;
+
+
+
+export const FindNearbyPlacesQueryParams = zod.object({
+  "latitude": zod.coerce.number().min(findNearbyPlacesQueryLatitudeMin).max(findNearbyPlacesQueryLatitudeMax),
+  "longitude": zod.coerce.number().min(findNearbyPlacesQueryLongitudeMin).max(findNearbyPlacesQueryLongitudeMax),
+  "radiusMeters": zod.coerce.number().int().min(findNearbyPlacesQueryRadiusMetersMin).max(findNearbyPlacesQueryRadiusMetersMax).default(findNearbyPlacesQueryRadiusMetersDefault),
+  "category": zod.coerce.string().optional().describe('Optional Buildora category filter')
+})
+
+export const FindNearbyPlacesResponse = zod.object({
+  "center": zod.object({
+  "displayName": zod.string(),
+  "latitude": zod.number(),
+  "longitude": zod.number(),
+  "source": zod.string()
+}),
+  "places": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "category": zod.string(),
+  "latitude": zod.number(),
+  "longitude": zod.number(),
+  "distanceKm": zod.number().nullable(),
+  "address": zod.string().nullable(),
+  "phone": zod.string().nullable(),
+  "website": zod.string().nullable(),
+  "osmUrl": zod.string().nullable()
+})),
+  "source": zod.string(),
+  "sourceNotice": zod.string()
+})
+
+
