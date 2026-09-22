@@ -14,6 +14,8 @@ tags:
     description: Buildora discovery content
   - name: locations
     description: Free-first map and nearby place discovery
+  - name: estimates
+    description: Deterministic construction cost estimates
 paths:
   /healthz:
     get:
@@ -167,6 +169,67 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /estimates:
+    get:
+      operationId: listConstructionEstimates
+      tags: [estimates]
+      summary: List the signed-in user's saved construction estimates
+      responses:
+        "200":
+          description: Saved construction estimates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConstructionEstimate"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load saved estimates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createConstructionEstimate
+      tags: [estimates]
+      summary: Save a construction estimate for the signed-in user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateConstructionEstimateBody"
+      responses:
+        "201":
+          description: Saved construction estimate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConstructionEstimate"
+        "400":
+          description: Invalid estimate data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to save estimate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -298,4 +361,100 @@ components:
         error:
           type: string
       required: [error]
+    CreateConstructionEstimateBody:
+      type: object
+      properties:
+        location:
+          type: string
+          minLength: 2
+        plotSize:
+          type: number
+          exclusiveMinimum: 0
+        plotUnit:
+          type: string
+          enum: [marla, kanal, squareFeet, squareYards]
+        plotAreaSqFt:
+          type: integer
+          minimum: 1
+        coveredAreaMode:
+          type: string
+          enum: [squareFeet, percentage]
+        coveredAreaBasis:
+          type: string
+          enum: [perFloor, total]
+        coveredAreaValue:
+          type: number
+          exclusiveMinimum: 0
+        floorCount:
+          type: integer
+          minimum: 1
+          maximum: 10
+        floors:
+          type: string
+          minLength: 1
+        constructionType:
+          type: string
+          enum: [greyStructure, complete]
+        quality:
+          type: string
+          enum: [basic, standard, premium]
+        totalCoveredAreaSqFt:
+          type: integer
+          minimum: 1
+        greyMin:
+          type: integer
+          minimum: 0
+        greyMax:
+          type: integer
+          minimum: 0
+        finishingMin:
+          type: integer
+          minimum: 0
+        finishingMax:
+          type: integer
+          minimum: 0
+        estimatedMin:
+          type: integer
+          minimum: 0
+        estimatedMax:
+          type: integer
+          minimum: 0
+        costPerSqFtMin:
+          type: integer
+          minimum: 0
+        costPerSqFtMax:
+          type: integer
+          minimum: 0
+      required:
+        - location
+        - plotSize
+        - plotUnit
+        - plotAreaSqFt
+        - coveredAreaMode
+        - coveredAreaBasis
+        - coveredAreaValue
+        - floorCount
+        - floors
+        - constructionType
+        - quality
+        - totalCoveredAreaSqFt
+        - greyMin
+        - greyMax
+        - finishingMin
+        - finishingMax
+        - estimatedMin
+        - estimatedMax
+        - costPerSqFtMin
+        - costPerSqFtMax
+    ConstructionEstimate:
+      allOf:
+        - $ref: "#/components/schemas/CreateConstructionEstimateBody"
+        - type: object
+          properties:
+            id:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+          required: [id, createdAt]
 

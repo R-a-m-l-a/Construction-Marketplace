@@ -138,3 +138,174 @@ export const FindNearbyPlacesResponse = zod.object({
 })
 
 
+/**
+ * @summary List the signed-in user's saved construction estimates
+ */
+export const listConstructionEstimatesResponseOneLocationMin = 2;
+
+export const listConstructionEstimatesResponseOnePlotSizeExclusiveMin = 0;
+
+
+export const listConstructionEstimatesResponseOneCoveredAreaValueExclusiveMin = 0;
+
+export const listConstructionEstimatesResponseOneFloorCountMax = 10;
+
+
+
+export const listConstructionEstimatesResponseOneGreyMinMin = 0;
+
+export const listConstructionEstimatesResponseOneGreyMaxMin = 0;
+
+export const listConstructionEstimatesResponseOneFinishingMinMin = 0;
+
+export const listConstructionEstimatesResponseOneFinishingMaxMin = 0;
+
+export const listConstructionEstimatesResponseOneEstimatedMinMin = 0;
+
+export const listConstructionEstimatesResponseOneEstimatedMaxMin = 0;
+
+export const listConstructionEstimatesResponseOneCostPerSqFtMinMin = 0;
+
+export const listConstructionEstimatesResponseOneCostPerSqFtMaxMin = 0;
+
+
+
+export const ListConstructionEstimatesResponseItem = zod.object({
+  "location": zod.string().min(listConstructionEstimatesResponseOneLocationMin),
+  "plotSize": zod.number().gt(listConstructionEstimatesResponseOnePlotSizeExclusiveMin),
+  "plotUnit": zod.enum(['marla', 'kanal', 'squareFeet', 'squareYards']),
+  "plotAreaSqFt": zod.number().int().min(1),
+  "coveredAreaMode": zod.enum(['squareFeet', 'percentage']),
+  "coveredAreaBasis": zod.enum(['perFloor', 'total']),
+  "coveredAreaValue": zod.number().gt(listConstructionEstimatesResponseOneCoveredAreaValueExclusiveMin),
+  "floorCount": zod.number().int().min(1).max(listConstructionEstimatesResponseOneFloorCountMax),
+  "floors": zod.string().min(1),
+  "constructionType": zod.enum(['greyStructure', 'complete']),
+  "quality": zod.enum(['basic', 'standard', 'premium']),
+  "totalCoveredAreaSqFt": zod.number().int().min(1),
+  "greyMin": zod.number().int().min(listConstructionEstimatesResponseOneGreyMinMin),
+  "greyMax": zod.number().int().min(listConstructionEstimatesResponseOneGreyMaxMin),
+  "finishingMin": zod.number().int().min(listConstructionEstimatesResponseOneFinishingMinMin),
+  "finishingMax": zod.number().int().min(listConstructionEstimatesResponseOneFinishingMaxMin),
+  "estimatedMin": zod.number().int().min(listConstructionEstimatesResponseOneEstimatedMinMin),
+  "estimatedMax": zod.number().int().min(listConstructionEstimatesResponseOneEstimatedMaxMin),
+  "costPerSqFtMin": zod.number().int().min(listConstructionEstimatesResponseOneCostPerSqFtMinMin),
+  "costPerSqFtMax": zod.number().int().min(listConstructionEstimatesResponseOneCostPerSqFtMaxMin)
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.coerce.date()
+}))
+export const ListConstructionEstimatesResponse = zod.array(ListConstructionEstimatesResponseItem)
+
+
+/**
+ * @summary Save a construction estimate for the signed-in user
+ */
+export const createConstructionEstimateBodyLocationMin = 2;
+
+export const createConstructionEstimateBodyPlotSizeExclusiveMin = 0;
+
+
+export const createConstructionEstimateBodyCoveredAreaValueExclusiveMin = 0;
+
+export const createConstructionEstimateBodyFloorCountMax = 10;
+
+
+
+export const createConstructionEstimateBodyGreyMinMin = 0;
+
+export const createConstructionEstimateBodyGreyMaxMin = 0;
+
+export const createConstructionEstimateBodyFinishingMinMin = 0;
+
+export const createConstructionEstimateBodyFinishingMaxMin = 0;
+
+export const createConstructionEstimateBodyEstimatedMinMin = 0;
+
+export const createConstructionEstimateBodyEstimatedMaxMin = 0;
+
+export const createConstructionEstimateBodyCostPerSqFtMinMin = 0;
+
+export const createConstructionEstimateBodyCostPerSqFtMaxMin = 0;
+
+
+
+export const CreateConstructionEstimateBody = zod.object({
+  "location": zod.string().min(createConstructionEstimateBodyLocationMin),
+  "plotSize": zod.number().gt(createConstructionEstimateBodyPlotSizeExclusiveMin),
+  "plotUnit": zod.enum(['marla', 'kanal', 'squareFeet', 'squareYards']),
+  "plotAreaSqFt": zod.number().int().min(1),
+  "coveredAreaMode": zod.enum(['squareFeet', 'percentage']),
+  "coveredAreaBasis": zod.enum(['perFloor', 'total']),
+  "coveredAreaValue": zod.number().gt(createConstructionEstimateBodyCoveredAreaValueExclusiveMin),
+  "floorCount": zod.number().int().min(1).max(createConstructionEstimateBodyFloorCountMax),
+  "floors": zod.string().min(1),
+  "constructionType": zod.enum(['greyStructure', 'complete']),
+  "quality": zod.enum(['basic', 'standard', 'premium']),
+  "totalCoveredAreaSqFt": zod.number().int().min(1),
+  "greyMin": zod.number().int().min(createConstructionEstimateBodyGreyMinMin),
+  "greyMax": zod.number().int().min(createConstructionEstimateBodyGreyMaxMin),
+  "finishingMin": zod.number().int().min(createConstructionEstimateBodyFinishingMinMin),
+  "finishingMax": zod.number().int().min(createConstructionEstimateBodyFinishingMaxMin),
+  "estimatedMin": zod.number().int().min(createConstructionEstimateBodyEstimatedMinMin),
+  "estimatedMax": zod.number().int().min(createConstructionEstimateBodyEstimatedMaxMin),
+  "costPerSqFtMin": zod.number().int().min(createConstructionEstimateBodyCostPerSqFtMinMin),
+  "costPerSqFtMax": zod.number().int().min(createConstructionEstimateBodyCostPerSqFtMaxMin)
+})
+
+export const createConstructionEstimateResponseOneLocationMin = 2;
+
+export const createConstructionEstimateResponseOnePlotSizeExclusiveMin = 0;
+
+
+export const createConstructionEstimateResponseOneCoveredAreaValueExclusiveMin = 0;
+
+export const createConstructionEstimateResponseOneFloorCountMax = 10;
+
+
+
+export const createConstructionEstimateResponseOneGreyMinMin = 0;
+
+export const createConstructionEstimateResponseOneGreyMaxMin = 0;
+
+export const createConstructionEstimateResponseOneFinishingMinMin = 0;
+
+export const createConstructionEstimateResponseOneFinishingMaxMin = 0;
+
+export const createConstructionEstimateResponseOneEstimatedMinMin = 0;
+
+export const createConstructionEstimateResponseOneEstimatedMaxMin = 0;
+
+export const createConstructionEstimateResponseOneCostPerSqFtMinMin = 0;
+
+export const createConstructionEstimateResponseOneCostPerSqFtMaxMin = 0;
+
+
+
+export const CreateConstructionEstimateResponse = zod.object({
+  "location": zod.string().min(createConstructionEstimateResponseOneLocationMin),
+  "plotSize": zod.number().gt(createConstructionEstimateResponseOnePlotSizeExclusiveMin),
+  "plotUnit": zod.enum(['marla', 'kanal', 'squareFeet', 'squareYards']),
+  "plotAreaSqFt": zod.number().int().min(1),
+  "coveredAreaMode": zod.enum(['squareFeet', 'percentage']),
+  "coveredAreaBasis": zod.enum(['perFloor', 'total']),
+  "coveredAreaValue": zod.number().gt(createConstructionEstimateResponseOneCoveredAreaValueExclusiveMin),
+  "floorCount": zod.number().int().min(1).max(createConstructionEstimateResponseOneFloorCountMax),
+  "floors": zod.string().min(1),
+  "constructionType": zod.enum(['greyStructure', 'complete']),
+  "quality": zod.enum(['basic', 'standard', 'premium']),
+  "totalCoveredAreaSqFt": zod.number().int().min(1),
+  "greyMin": zod.number().int().min(createConstructionEstimateResponseOneGreyMinMin),
+  "greyMax": zod.number().int().min(createConstructionEstimateResponseOneGreyMaxMin),
+  "finishingMin": zod.number().int().min(createConstructionEstimateResponseOneFinishingMinMin),
+  "finishingMax": zod.number().int().min(createConstructionEstimateResponseOneFinishingMaxMin),
+  "estimatedMin": zod.number().int().min(createConstructionEstimateResponseOneEstimatedMinMin),
+  "estimatedMax": zod.number().int().min(createConstructionEstimateResponseOneEstimatedMaxMin),
+  "costPerSqFtMin": zod.number().int().min(createConstructionEstimateResponseOneCostPerSqFtMinMin),
+  "costPerSqFtMax": zod.number().int().min(createConstructionEstimateResponseOneCostPerSqFtMaxMin)
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.coerce.date()
+}))
+
+

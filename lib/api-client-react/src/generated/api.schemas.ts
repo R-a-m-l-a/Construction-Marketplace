@@ -82,6 +82,95 @@ export interface ErrorResponse {
   error: string;
 }
 
+export type CreateConstructionEstimateBodyPlotUnit = typeof CreateConstructionEstimateBodyPlotUnit[keyof typeof CreateConstructionEstimateBodyPlotUnit];
+
+
+export const CreateConstructionEstimateBodyPlotUnit = {
+  marla: 'marla',
+  kanal: 'kanal',
+  squareFeet: 'squareFeet',
+  squareYards: 'squareYards',
+} as const;
+
+export type CreateConstructionEstimateBodyCoveredAreaMode = typeof CreateConstructionEstimateBodyCoveredAreaMode[keyof typeof CreateConstructionEstimateBodyCoveredAreaMode];
+
+
+export const CreateConstructionEstimateBodyCoveredAreaMode = {
+  squareFeet: 'squareFeet',
+  percentage: 'percentage',
+} as const;
+
+export type CreateConstructionEstimateBodyCoveredAreaBasis = typeof CreateConstructionEstimateBodyCoveredAreaBasis[keyof typeof CreateConstructionEstimateBodyCoveredAreaBasis];
+
+
+export const CreateConstructionEstimateBodyCoveredAreaBasis = {
+  perFloor: 'perFloor',
+  total: 'total',
+} as const;
+
+export type CreateConstructionEstimateBodyConstructionType = typeof CreateConstructionEstimateBodyConstructionType[keyof typeof CreateConstructionEstimateBodyConstructionType];
+
+
+export const CreateConstructionEstimateBodyConstructionType = {
+  greyStructure: 'greyStructure',
+  complete: 'complete',
+} as const;
+
+export type CreateConstructionEstimateBodyQuality = typeof CreateConstructionEstimateBodyQuality[keyof typeof CreateConstructionEstimateBodyQuality];
+
+
+export const CreateConstructionEstimateBodyQuality = {
+  basic: 'basic',
+  standard: 'standard',
+  premium: 'premium',
+} as const;
+
+export interface CreateConstructionEstimateBody {
+  /** @minLength 2 */
+  location: string;
+  /** @exclusiveMinimum 0 */
+  plotSize: number;
+  plotUnit: CreateConstructionEstimateBodyPlotUnit;
+  /** @minimum 1 */
+  plotAreaSqFt: number;
+  coveredAreaMode: CreateConstructionEstimateBodyCoveredAreaMode;
+  coveredAreaBasis: CreateConstructionEstimateBodyCoveredAreaBasis;
+  /** @exclusiveMinimum 0 */
+  coveredAreaValue: number;
+  /**
+     * @minimum 1
+     * @maximum 10
+     */
+  floorCount: number;
+  /** @minLength 1 */
+  floors: string;
+  constructionType: CreateConstructionEstimateBodyConstructionType;
+  quality: CreateConstructionEstimateBodyQuality;
+  /** @minimum 1 */
+  totalCoveredAreaSqFt: number;
+  /** @minimum 0 */
+  greyMin: number;
+  /** @minimum 0 */
+  greyMax: number;
+  /** @minimum 0 */
+  finishingMin: number;
+  /** @minimum 0 */
+  finishingMax: number;
+  /** @minimum 0 */
+  estimatedMin: number;
+  /** @minimum 0 */
+  estimatedMax: number;
+  /** @minimum 0 */
+  costPerSqFtMin: number;
+  /** @minimum 0 */
+  costPerSqFtMax: number;
+}
+
+export type ConstructionEstimate = CreateConstructionEstimateBody & {
+  id: string;
+  createdAt: string;
+};
+
 export type GeocodeLocationParams = {
 /**
  * City, area, landmark, or address to search

@@ -1,0 +1,417 @@
+Continue the existing Buildora project.
+
+Phase 1 and Phase 2 are complete and working.
+
+Implement **PHASE 3 ONLY: AI Construction Assistant**.
+
+Do NOT rebuild existing features.
+Do NOT replace Clerk authentication.
+Do NOT break the marketplace, professionals directory, location search, map, or existing authentication.
+
+The goal is to add a useful construction-focused AI assistant that can understand a user's construction question and help them navigate Buildora.
+
+---
+
+# 1. AI Assistant UI
+
+Add an AI Construction Assistant accessible from the main navigation and an appropriate homepage entry point.
+
+Name it:
+
+**Buildora AI**
+
+Subtitle:
+
+**Your construction planning assistant**
+
+Create a clean chat interface with:
+
+* Conversation messages
+* User messages
+* AI responses
+* Text input
+* Send button
+* Loading/typing state
+* Error state
+* Clear conversation button
+
+Make the interface responsive on desktop and mobile.
+
+Do not make it look like a generic ChatGPT clone.
+
+Use Buildora's existing branding/design system.
+
+---
+
+# 2. Important Free-First Rule
+
+The user currently wants to keep the MVP as low-cost as possible.
+
+Do NOT make an AI API call on page load.
+
+Do NOT automatically call the AI whenever the user opens the page.
+
+Only make an AI request after the user explicitly sends a message.
+
+Do not add any paid AI service other than the existing OpenAI integration if one is already configured.
+
+If no OpenAI API key is configured, the application must fail gracefully and clearly explain that the AI service has not been configured yet.
+
+Do not hard-code an API key.
+
+Use environment variables.
+
+---
+
+# 3. AI Provider
+
+Inspect the existing project before implementing.
+
+If an OpenAI integration already exists, reuse the existing configuration and API patterns.
+
+Otherwise create a clean server-side OpenAI integration using an environment variable such as:
+
+OPENAI_API_KEY
+
+Never expose the API key to the browser.
+
+Keep the model configurable through an environment variable if practical.
+
+Use a cost-conscious model suitable for a small MVP.
+
+Do not use unnecessarily expensive models.
+
+---
+
+# 4. Construction-Focused System Instructions
+
+The assistant should behave as a practical construction planning assistant for Buildora.
+
+It should be able to help with topics such as:
+
+* Construction materials
+* Basic construction planning
+* Contractors
+* Architects
+* Civil engineers
+* Interior designers
+* Electrical work
+* Plumbing
+* Tiles
+* Paint
+* Hardware
+* General construction terminology
+* Approximate planning questions
+* Questions about Buildora marketplace/services
+* Finding appropriate types of professionals
+* Explaining construction concepts in simple language
+
+The assistant should NOT pretend to be a licensed engineer, architect, lawyer, surveyor, or financial advisor.
+
+For structural, electrical, gas, safety, legal, or other high-risk questions, clearly recommend consulting a qualified local professional.
+
+Do not provide dangerous or unsafe construction instructions.
+
+---
+
+# 5. Pakistan Context
+
+Buildora is initially intended for users in Pakistan.
+
+The assistant may understand Pakistan-specific construction terminology and common units such as:
+
+* Marla
+* Kanal
+* Square feet
+* Square yards
+* Gaz
+
+It should understand common construction terms used in Pakistan.
+
+However:
+
+DO NOT invent current material prices.
+
+DO NOT claim exact labor rates.
+
+DO NOT claim exact market costs unless real current data is available through Buildora.
+
+When discussing prices without verified data, clearly describe them as approximate and explain that actual prices vary by city, material quality, labor, and market conditions.
+
+---
+
+# 6. Buildora-Aware Responses
+
+The important difference between Buildora AI and a generic chatbot is that it should understand what Buildora can actually do.
+
+The assistant should be able to guide users toward:
+
+* Marketplace
+* Professionals
+* Location discovery
+* Construction services
+* Future cost calculator
+* Project posting
+
+For example:
+
+User:
+"I need someone to build my house in Peshawar."
+
+Assistant:
+"Buildora can help you find construction professionals near Peshawar. Would you like to search for contractors, architects, or civil engineers?"
+
+User:
+"I need a tile shop near Hayatabad."
+
+Assistant:
+"Let's help you find nearby tile and building-material suppliers."
+
+Where possible, provide links/buttons into the existing Buildora features instead of merely describing them.
+
+Do not invent listings.
+
+---
+
+# 7. Tool-Friendly Architecture
+
+Design the AI architecture so that Buildora can later give the AI real tools.
+
+Create a clean structure that can eventually support tools such as:
+
+* searchMarketplace
+* searchProfessionals
+* searchNearbyPlaces
+* calculateConstructionEstimate
+* createProjectLead
+
+For Phase 3, implement the AI chat itself first.
+
+If implementing tool calling is straightforward within the existing architecture, implement only the safest useful tools that already have real working APIs.
+
+Do NOT create fake tool responses.
+
+Do NOT return fake businesses.
+
+If a tool does not yet exist, leave a clean extension point for Phase 4/5.
+
+---
+
+# 8. Contextual Location
+
+If the user has already selected a location in the existing Phase 2 location system, make that location available to the assistant as optional context.
+
+For example:
+
+Selected location:
+Peshawar, Pakistan
+
+Then the assistant can understand:
+
+"Find a contractor near me."
+
+However:
+
+Do not access the user's location without permission.
+
+Do not continuously track location.
+
+Do not send precise location information to the AI unless it is actually needed for the user's request.
+
+Allow the user to change or remove location context.
+
+---
+
+# 9. Suggested Prompts
+
+When the chat is empty, show useful starter prompts such as:
+
+**"I want to build a 5 marla house. Where should I start?"**
+
+**"Find construction professionals near me"**
+
+**"What materials do I need for a house?"**
+
+**"What's the difference between a contractor and a civil engineer?"**
+
+**"I need a tile supplier in my area"**
+
+These should populate the input when clicked rather than automatically sending an AI request.
+
+---
+
+# 10. Conversation Handling
+
+Keep the current conversation available while the user remains on the page.
+
+The assistant should remember the recent messages in the current conversation.
+
+Do not build permanent conversation history/database storage yet unless it already exists naturally in the current architecture.
+
+Keep the MVP simple.
+
+Prevent excessively large conversation payloads.
+
+Limit the amount of previous conversation sent to the model when necessary to control cost.
+
+---
+
+# 11. API Route
+
+Create a secure server-side API endpoint for AI requests.
+
+Example:
+
+POST /api/ai/chat
+
+The browser should send the user's message and relevant non-sensitive context.
+
+The server should:
+
+1. Validate the request
+2. Build the system instructions
+3. Add relevant conversation context
+4. Call the AI provider
+5. Return the response
+6. Handle errors safely
+
+Never expose the API key.
+
+Do not log user prompts or API keys unnecessarily.
+
+---
+
+# 12. Input Validation
+
+Handle:
+
+* Empty messages
+* Extremely long messages
+* Repeated submissions
+* Network failure
+* AI provider failure
+* Missing API key
+* Rate-limit errors
+
+Disable the send button while a request is being processed.
+
+Prevent accidental duplicate requests.
+
+---
+
+# 13. Error Messages
+
+Use friendly messages.
+
+For example:
+
+If AI configuration is missing:
+
+"Buildora AI isn't configured yet. The rest of Buildora is still available."
+
+If the AI service fails:
+
+"Buildora AI is temporarily unavailable. Please try again."
+
+Do not expose raw API errors, stack traces, or secrets to the user.
+
+---
+
+# 14. Cost Protection
+
+Because this is an early prototype with only a few testers:
+
+Implement basic protection against accidental excessive usage.
+
+For example:
+
+* Limit message length
+* Prevent duplicate submissions
+* Limit conversation context
+* Do not call AI automatically
+* Do not call AI on every keystroke
+* Do not retry AI requests endlessly
+
+If a simple per-user/session rate limit can be implemented cleanly using the existing architecture, add one.
+
+Do not introduce a complicated paid usage/billing system.
+
+---
+
+# 15. Existing Features Must Continue Working
+
+After implementing Phase 3, verify that these still work:
+
+* Homepage
+* Marketplace
+* Marketplace search/filtering
+* Professionals directory
+* Authentication
+* Protected dashboard
+* Location search
+* Current location
+* OpenStreetMap map
+* Nearby construction results
+* Category filtering
+* Result details
+
+Do not replace or break these features.
+
+---
+
+# 16. Do NOT Implement Yet
+
+Stop after Phase 3.
+
+Do NOT implement:
+
+* Construction cost calculator
+* Project lead creation
+* Vendor dashboard
+* Professional dashboard
+* Reviews
+* Payments
+* Subscriptions
+* WhatsApp integration
+* Messaging
+* Complex admin system
+* AI-generated fake marketplace listings
+* AI-generated fake business information
+
+Those belong to later phases.
+
+---
+
+# 17. Testing
+
+Before declaring Phase 3 complete, test:
+
+1. Open Buildora AI
+2. Send a basic construction question
+3. Ask a Pakistan-specific construction question
+4. Ask a question about finding a professional
+5. Test a suggested prompt
+6. Send an empty message
+7. Send a long message
+8. Send multiple messages
+9. Test loading state
+10. Test AI/API failure
+11. Test missing API key behavior
+12. Test mobile layout
+13. Refresh the page
+14. Verify Phase 1 and Phase 2 features still work
+15. Run the production build
+
+At the end, give me a concise report:
+
+* What was implemented
+* Files/components changed
+* AI provider/model used
+* Environment variables required
+* Whether any API key is required
+* Whether any paid service is required
+* What I should manually test
+* Any known limitations
+
+STOP after Phase 3.
+Do not automatically begin Phase 4.

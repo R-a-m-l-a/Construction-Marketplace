@@ -1,0 +1,581 @@
+Continue working on the existing Buildora project.
+
+Phase 1 and Phase 2 are complete and working.
+
+Implement **PHASE 3 ONLY: Construction Cost Calculator**.
+
+Do NOT rebuild existing features.
+Do NOT replace Clerk authentication.
+Do NOT break the marketplace, professionals directory, authentication, dashboard, location search, OpenStreetMap map, or nearby-services discovery.
+
+The goal is to add a useful, functional construction cost estimation tool for users in Pakistan.
+
+---
+
+# 1. Main Feature
+
+Create a dedicated:
+
+**Construction Cost Calculator**
+
+accessible from the main navigation and an appropriate homepage section.
+
+The calculator should allow a user to enter basic project information and receive a transparent estimated construction cost.
+
+This is an ESTIMATION tool, not a quotation.
+
+Clearly display:
+
+**"This is an approximate estimate. Actual costs vary by location, material quality, design, labor rates, market prices, and contractor."**
+
+Do not present estimates as guaranteed prices.
+
+---
+
+# 2. User Inputs
+
+Create a clean, easy-to-understand form.
+
+Include:
+
+### Location
+
+Allow the user to select/search a city or area.
+
+Reuse the existing Phase 2 location functionality where practical.
+
+Examples:
+
+* Islamabad
+* Rawalpindi
+* Peshawar
+* Lahore
+* Karachi
+
+Do not hard-code the calculation to one city.
+
+---
+
+### Property Size
+
+Allow common Pakistani property-size units:
+
+* Marla
+* Kanal
+* Square feet
+* Square yards
+
+Allow the user to enter a custom size.
+
+Example:
+
+5 Marla
+
+or
+
+1125 sq ft
+
+Do not assume that every "marla" is the same size.
+
+Use a configurable conversion system rather than scattering hard-coded conversions throughout the application.
+
+Clearly indicate the conversion being used.
+
+For the initial Pakistan MVP, use a configurable default for marla rather than pretending there is one universal standard.
+
+---
+
+### Covered Area
+
+Ask for:
+
+**Estimated covered area**
+
+Allow:
+
+* Square feet
+* Percentage of plot area
+
+If percentage is selected, calculate the covered area from the plot size.
+
+Example:
+
+Plot = 5 marla
+Covered area = 80%
+
+Then calculate the corresponding approximate covered square footage.
+
+Allow the user to override the calculated covered area manually.
+
+---
+
+### Number of Floors
+
+Options:
+
+* Ground floor
+* Ground + 1
+* Ground + 2
+* Custom number
+
+Calculate total covered area appropriately.
+
+Do not simply multiply everything blindly if the user has manually entered total covered area.
+
+Clearly distinguish:
+
+**Plot Area**
+
+from
+
+**Total Covered Area**
+
+---
+
+# 3. Construction Quality
+
+Provide three simple options:
+
+### Basic
+
+Economical materials and finishes.
+
+### Standard
+
+Mid-range materials and finishes.
+
+### Premium
+
+Higher-end materials and finishes.
+
+Explain briefly what the options mean.
+
+Do not claim specific brands unless actual data exists.
+
+---
+
+# 4. Construction Type
+
+Allow the user to choose an appropriate construction type such as:
+
+* Grey Structure
+* Complete Construction
+
+If "Complete Construction" is selected, include finishing-related costs.
+
+If "Grey Structure" is selected, exclude or separate finishing costs.
+
+Make this distinction very clear.
+
+---
+
+# 5. Calculation Engine
+
+Create a clean calculation service/module rather than placing all calculations directly inside the UI component.
+
+The calculation should consider:
+
+* Total covered area
+* Location
+* Construction type
+* Quality level
+* Number of floors
+
+Return an estimated RANGE rather than a single false-precision number.
+
+Example:
+
+Estimated construction cost:
+
+**PKR 1.8M – 2.2M**
+
+Do not use these example numbers as actual market prices.
+
+The values must come from a clearly separated configurable pricing/estimation data layer.
+
+---
+
+# 6. Pricing / Estimation Data
+
+IMPORTANT:
+
+Do not claim that hard-coded prices are current Pakistani market prices.
+
+For the MVP, create a clearly identifiable configuration/data layer for estimation assumptions.
+
+For example:
+
+* cost per square foot ranges
+* grey-structure cost assumptions
+* finishing cost assumptions
+* quality multipliers
+* location multipliers
+
+Keep these values centralized.
+
+Do NOT scatter pricing numbers throughout components.
+
+Structure the code so that later we can replace these assumptions with:
+
+* Admin-managed pricing
+* Database pricing
+* Verified market data
+* City-specific pricing
+
+without rewriting the calculator UI.
+
+---
+
+# 7. Transparent Calculation
+
+After calculation, show the user a simple breakdown.
+
+For example:
+
+### Project Summary
+
+Location:
+Peshawar
+
+Plot:
+5 Marla
+
+Covered Area:
+1,800 sq ft
+
+Floors:
+Ground + 1
+
+Construction:
+Complete
+
+Quality:
+Standard
+
+---
+
+### Estimated Cost
+
+Grey Structure:
+PKR X – Y
+
+Finishing:
+PKR X – Y
+
+Estimated Total:
+**PKR X – Y**
+
+Again, use the configured estimation data.
+
+Do not invent real market prices.
+
+---
+
+# 8. Material Estimate
+
+If the estimation methodology can support it reliably, also show approximate quantities for major materials:
+
+* Cement
+* Steel
+* Bricks/blocks
+* Sand
+* Crush
+
+IMPORTANT:
+
+These should be clearly labeled:
+
+**"Approximate quantity — final quantity depends on architectural and structural design."**
+
+Do not present them as engineering specifications.
+
+If reliable quantity calculations cannot be implemented safely at this stage, leave the material-quantity section out rather than inventing formulas.
+
+---
+
+# 9. Location Integration
+
+Reuse Phase 2 where possible.
+
+If the user has already selected a location:
+
+Pre-fill the calculator location.
+
+If they haven't:
+
+Allow manual city/location selection.
+
+Do not require precise GPS location to use the calculator.
+
+The calculator should work even if the user denies location permission.
+
+---
+
+# 10. Results UX
+
+Make the results easy to understand.
+
+Include:
+
+* Estimated total range
+* Cost per sq ft range
+* Grey structure estimate
+* Finishing estimate where applicable
+* Project summary
+* Important assumptions
+* Disclaimer
+
+Provide:
+
+**"Recalculate"**
+
+and:
+
+**"Start Over"**
+
+buttons.
+
+---
+
+# 11. Save Estimate
+
+If the user is authenticated, allow them to save an estimate to their Buildora account.
+
+If implementing this requires substantial new database architecture, keep it simple.
+
+Create an appropriate database model/table such as:
+
+construction_estimates
+
+Possible fields:
+
+* id
+* user_id
+* location
+* plot_size
+* plot_unit
+* covered_area
+* floors
+* construction_type
+* quality
+* estimated_min
+* estimated_max
+* created_at
+
+Use the existing authentication architecture.
+
+Do not store sensitive information unnecessarily.
+
+If saving estimates is not currently practical because of the existing database architecture, implement the calculator first and leave a clean extension point.
+
+---
+
+# 12. User-Friendly Validation
+
+Validate:
+
+* Empty inputs
+* Negative numbers
+* Zero values
+* Extremely large values
+* Invalid units
+* Missing location
+* Missing construction type
+* Missing quality
+
+Use friendly messages.
+
+Examples:
+
+"Please enter a valid property size."
+
+"Covered area cannot be greater than the allowed project area unless you have selected multiple floors."
+
+Do not allow invalid calculations to produce NaN, Infinity, or broken UI.
+
+---
+
+# 13. Mobile Design
+
+The calculator must work well on mobile.
+
+Use:
+
+* Clear labels
+* Large inputs
+* Easy dropdowns
+* Simple sections
+* Sticky/visible Calculate button where appropriate
+
+Avoid overwhelming the user with a huge form.
+
+Use progressive sections if necessary.
+
+---
+
+# 14. Homepage Integration
+
+Add a suitable Buildora homepage section/card:
+
+**Calculate Your Construction Cost**
+
+Example description:
+
+"Get a quick approximate estimate based on your project size, location, construction type and quality."
+
+Button:
+
+**Calculate Now**
+
+Link it to the calculator.
+
+Do not make the homepage cluttered.
+
+Follow the existing Buildora visual design.
+
+---
+
+# 15. API / Architecture
+
+Prefer a clean calculation architecture.
+
+If the calculation is purely deterministic and uses public configuration data, it does not need an external API.
+
+Do NOT use OpenAI for calculations.
+
+Do NOT use Google Maps.
+
+Do NOT introduce a paid API.
+
+Keep the calculation deterministic and testable.
+
+If server-side calculation is more appropriate for the existing architecture, create a typed API endpoint.
+
+Otherwise a shared calculation service is acceptable.
+
+---
+
+# 16. Accuracy and Safety
+
+This calculator is for early planning only.
+
+Clearly communicate that:
+
+* Actual construction costs vary.
+* Material prices change.
+* Labor rates vary by city and contractor.
+* Architectural design affects quantities.
+* Structural design affects quantities.
+* Soil/foundation requirements can significantly change costs.
+* Finishing choices can significantly change costs.
+
+For structural or engineering decisions, recommend consulting a qualified professional.
+
+Do not claim the calculator replaces an architect, engineer, quantity surveyor, or contractor.
+
+---
+
+# 17. Existing Features Must Continue Working
+
+After implementing Phase 3, verify:
+
+### Phase 1
+
+* Homepage
+* Marketplace
+* Marketplace search
+* Marketplace filters
+* Professionals directory
+* Authentication
+* Protected dashboard
+* Logout
+
+### Phase 2
+
+* Location search
+* Current location
+* OpenStreetMap map
+* Nearby construction discovery
+* Category filtering
+* Result details
+* Directions
+
+Nothing from these phases should regress.
+
+---
+
+# 18. Do NOT Implement Yet
+
+STOP after Phase 3.
+
+Do NOT implement:
+
+* AI assistant
+* Project posting
+* Project leads
+* Vendor dashboards
+* Professional dashboards
+* Reviews
+* Payments
+* Subscriptions
+* WhatsApp
+* Messaging
+* Complex admin dashboard
+* Automated market-price scraping
+* Google Maps
+* Paid APIs
+
+These belong to later phases.
+
+---
+
+# 19. Testing
+
+Before declaring Phase 3 complete, test at least:
+
+1. 5 Marla project
+2. 10 Marla project
+3. Square-foot input
+4. Different locations
+5. Different construction qualities
+6. Grey structure
+7. Complete construction
+8. Multiple floors
+9. Invalid/negative input
+10. Very large input
+11. Recalculate
+12. Start over
+13. Save estimate if implemented
+14. Mobile layout
+15. Refresh page
+16. Verify Phase 1 features
+17. Verify Phase 2 features
+18. Run production build
+
+Test that calculations never produce:
+
+* NaN
+* Infinity
+* undefined
+* negative costs
+* broken UI
+
+---
+
+# 20. Completion Report
+
+When finished, give me a concise report containing:
+
+* What was implemented
+* Files/components changed
+* Calculation methodology
+* Where estimation assumptions are stored
+* Database changes, if any
+* Environment variables, if any
+* Whether any paid service is required
+* What I should manually test
+* Known limitations
+
+STOP after Phase 3.
+
+Do not automatically start Phase 4.

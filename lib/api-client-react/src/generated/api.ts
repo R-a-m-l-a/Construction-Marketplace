@@ -6,17 +6,23 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
   Category,
+  ConstructionEstimate,
+  CreateConstructionEstimateBody,
   DiscoveryStats,
   ErrorResponse,
   FindNearbyPlacesParams,
@@ -29,7 +35,7 @@ import type {
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
-import type { ErrorType } from '../custom-fetch';
+import type { ErrorType , BodyType } from '../custom-fetch';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -608,4 +614,169 @@ export function useFindNearbyPlaces<TData = Awaited<ReturnType<typeof findNearby
 
 
 
+
+export const getListConstructionEstimatesUrl = () => {
+
+
+
+
+  return `/api/estimates`
+}
+
+/**
+ * @summary List the signed-in user's saved construction estimates
+ */
+export const listConstructionEstimates = async ( options?: Parameters<typeof customFetch>[1]): Promise<ConstructionEstimate[]> => {
+
+  return customFetch<ConstructionEstimate[]>(getListConstructionEstimatesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListConstructionEstimatesQueryKey = () => {
+    return [
+    `/api/estimates`
+    ] as const;
+    }
+
+
+export const getListConstructionEstimatesQueryOptions = <TData = Awaited<ReturnType<typeof listConstructionEstimates>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listConstructionEstimates>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListConstructionEstimatesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listConstructionEstimates>>> = ({ signal }) => listConstructionEstimates({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listConstructionEstimates>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListConstructionEstimatesQueryResult = NonNullable<Awaited<ReturnType<typeof listConstructionEstimates>>>
+export type ListConstructionEstimatesQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List the signed-in user's saved construction estimates
+ */
+
+export function useListConstructionEstimates<TData = Awaited<ReturnType<typeof listConstructionEstimates>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listConstructionEstimates>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListConstructionEstimatesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateConstructionEstimateUrl = () => {
+
+
+
+
+  return `/api/estimates`
+}
+
+/**
+ * @summary Save a construction estimate for the signed-in user
+ */
+export const createConstructionEstimate = async (createConstructionEstimateBody: CreateConstructionEstimateBody, options?: Parameters<typeof customFetch>[1]): Promise<ConstructionEstimate> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ConstructionEstimate>(getCreateConstructionEstimateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createConstructionEstimateBody)
+  }
+);}
+
+
+
+
+
+export const getCreateConstructionEstimateMutationKey = () => ['createConstructionEstimate'] as const;
+
+export const getCreateConstructionEstimateMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createConstructionEstimate>>, TError,CreateConstructionEstimateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createConstructionEstimate>>, TError,CreateConstructionEstimateMutationVariables, TContext> => {
+
+const mutationKey = getCreateConstructionEstimateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createConstructionEstimate>>, CreateConstructionEstimateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createConstructionEstimate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateConstructionEstimateMutationResult = NonNullable<Awaited<ReturnType<typeof createConstructionEstimate>>>
+    export type CreateConstructionEstimateMutationBody = BodyType<CreateConstructionEstimateBody>
+    export type CreateConstructionEstimateMutationError = ErrorType<ErrorResponse>
+    export type CreateConstructionEstimateMutationVariables = {data: BodyType<CreateConstructionEstimateBody>}
+
+    /**
+ * @summary Save a construction estimate for the signed-in user
+ */
+export const useCreateConstructionEstimate = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createConstructionEstimate>>, TError,CreateConstructionEstimateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createConstructionEstimate>>,
+        TError,
+        CreateConstructionEstimateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateConstructionEstimateMutationOptions(options));
+    }
 
