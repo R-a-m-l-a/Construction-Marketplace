@@ -6,14 +6,18 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Phase 6D public preview of a real professional row. Mirrors the `PublicProfessional` read model used by professional discovery, except that `phone` and `whatsapp` are deliberately excluded: a listing preview is not a contact surface, and the Call and WhatsApp actions live on the public profile page. There is no `rating`, `yearsExperience` or `verified` field, because none of those exist on the real schema and manufacturing them would be inventing data.
+ */
 export interface ProfessionalPreview {
   id: string;
   name: string;
+  profession: string;
   category: string;
+  services: string;
   city: string;
-  rating: number;
-  yearsExperience: number;
-  verified: boolean;
-  source: string;
-  description: string;
+  /** @nullable */
+  location: string | null;
+  /** @nullable */
+  logoUrl: string | null;
 }

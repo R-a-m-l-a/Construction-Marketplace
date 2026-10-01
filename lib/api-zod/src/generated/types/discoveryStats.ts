@@ -6,9 +6,16 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Phase 6D: every value is a real database count. `marketplaceItems` is the number of published products. `professionalCategories` is the number of distinct `professionals.category` values. `citiesCovered` is the number of distinct `professionals.city` values, which is the narrowest reading that matches the homepage label "cities covered" sitting beside "trade categories": both describe professional coverage. `demoNotice` remains as a required string so the generated client type does not change, but it is now a plain status string rather than a warning about fictional data.
+ */
 export interface DiscoveryStats {
+  /** Count of published products. */
   marketplaceItems: number;
+  /** Count of distinct categories across real professionals. */
   professionalCategories: number;
+  /** Count of distinct cities across real professionals. */
   citiesCovered: number;
+  /** Retained for client compatibility. No longer announces demo data, since all discovery data is now database-backed. */
   demoNotice: string;
 }

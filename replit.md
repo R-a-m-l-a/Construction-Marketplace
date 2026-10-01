@@ -1,11 +1,11 @@
-# Buildora
+# QadeerBuilds
 
-Buildora is a free-first construction discovery app for finding materials, professionals, and clearer next steps in Pakistan.
+QadeerBuilds is a free-first construction discovery app for finding materials, professionals, and clearer next steps in Pakistan.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server
-- `pnpm --filter @workspace/buildora run dev` — run the Buildora web app
+- `pnpm --filter @workspace/qadeerbuilds run dev` — run the QadeerBuilds web app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -22,17 +22,17 @@ Buildora is a free-first construction discovery app for finding materials, profe
 
 ## Where things live
 
-- `artifacts/buildora/src/pages/buildora-pages.tsx` — public routes and first-phase product surfaces
-- `artifacts/buildora/src/components/buildora-shell.tsx` — shared navigation, footer, loading, error, and demo states
-- `artifacts/buildora/src/components/location-discovery.tsx` — Leaflet map, geocoding, nearby results, filters, and place detail states
+- `artifacts/qadeerbuilds/src/pages/qadeerbuilds-pages.tsx` — public routes and first-phase product surfaces
+- `artifacts/qadeerbuilds/src/components/qadeerbuilds-shell.tsx` — shared navigation, footer, loading, error, and demo states
+- `artifacts/qadeerbuilds/src/components/location-discovery.tsx` — Leaflet map, geocoding, nearby results, filters, and place detail states
 - `artifacts/api-server/src/routes/discovery.ts` — typed discovery endpoints and clearly marked fictional demo content
 - `artifacts/api-server/src/routes/locations.ts` — server-side Nominatim and Overpass adapters
 - `lib/api-spec/openapi.yaml` — source of truth for discovery API contracts
-- `artifacts/buildora/src/index.css` — Buildora visual tokens and responsive styling
+- `artifacts/qadeerbuilds/src/index.css` — QadeerBuilds visual tokens and responsive styling
 
 ## Architecture decisions
 
-- Buildora is an original product identity, not a visual or content copy of Tameer.AI.
+- QadeerBuilds is an original product identity, not a visual or content copy of Tameer.AI.
 - The MVP is free-first: Replit-managed Clerk handles auth; paid Google Maps and OpenAI are not required for the first tester group.
 - Demo marketplace and professional records are fictional and visibly labeled; real-world discovery will use a free map/search adapter in a later phase.
 - The first phase uses typed API endpoints so the homepage and directories are not static mockups.

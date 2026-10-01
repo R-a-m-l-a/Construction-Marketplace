@@ -46,7 +46,7 @@ async function fetchJson<T>(
     ...init,
     headers: {
       accept: "application/json",
-      "user-agent": "Buildora/1.0 (free-first construction discovery MVP)",
+      "user-agent": "QadeerBuilds/1.0 (free-first construction discovery MVP)",
       ...init?.headers,
     },
     signal: AbortSignal.timeout(25_000),
@@ -245,7 +245,7 @@ out center tags;`;
           displayName: "Selected location",
           latitude,
           longitude,
-          source: "Buildora map search",
+          source: "QadeerBuilds map search",
         },
         places,
         source: "OpenStreetMap Overpass",

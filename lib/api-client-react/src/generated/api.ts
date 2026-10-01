@@ -20,18 +20,36 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  Category,
   ConstructionEstimate,
   CreateConstructionEstimateBody,
+  CreateProfessionalBody,
+  CreateProfessionalProjectBody,
+  CreateProjectBriefBody,
+  CreateQuoteRequestBody,
+  CreateSupplierQuoteRequestBody,
   DiscoveryStats,
   ErrorResponse,
   FindNearbyPlacesParams,
   GeocodeLocationParams,
+  GetPublicProductResponse,
+  GetPublicSupplierResponse,
   HealthStatus,
+  ListProductsParams,
+  ListPublicProfessionalsParams,
   LocationResult,
+  MarketplaceCategory,
   NearbyPlacesResponse,
   ProductPreview,
-  ProfessionalPreview
+  Professional,
+  ProfessionalPreview,
+  ProfessionalProject,
+  ProjectBrief,
+  PublicProfessional,
+  PublicProfessionalProject,
+  QuoteRequest,
+  SupplierQuoteRequest,
+  UpdateProfessionalBody,
+  UpdateProfessionalProjectBody
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -139,6 +157,326 @@ export function useHealthCheck<TData = Awaited<ReturnType<typeof healthCheck>>, 
 
 
 
+export const getGetPublicProductUrl = (id: string,) => {
+
+
+
+
+  return `/api/products/${id}`
+}
+
+/**
+ * @summary Get one public marketplace product with its supplier and category
+ */
+export const getPublicProduct = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<GetPublicProductResponse> => {
+
+  return customFetch<GetPublicProductResponse>(getGetPublicProductUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicProductQueryKey = (id: string,) => {
+    return [
+    `/api/products/${id}`
+    ] as const;
+    }
+
+
+export const getGetPublicProductQueryOptions = <TData = Awaited<ReturnType<typeof getPublicProduct>>, TError = ErrorType<ErrorResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicProduct>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicProductQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicProduct>>> = ({ signal }) => getPublicProduct(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicProduct>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicProductQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicProduct>>>
+export type GetPublicProductQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get one public marketplace product with its supplier and category
+ */
+
+export function useGetPublicProduct<TData = Awaited<ReturnType<typeof getPublicProduct>>, TError = ErrorType<ErrorResponse>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicProduct>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicProductQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPublicSupplierUrl = (id: string,) => {
+
+
+
+
+  return `/api/suppliers/${id}`
+}
+
+/**
+ * @summary Get one public supplier with their published products
+ */
+export const getPublicSupplier = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<GetPublicSupplierResponse> => {
+
+  return customFetch<GetPublicSupplierResponse>(getGetPublicSupplierUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicSupplierQueryKey = (id: string,) => {
+    return [
+    `/api/suppliers/${id}`
+    ] as const;
+    }
+
+
+export const getGetPublicSupplierQueryOptions = <TData = Awaited<ReturnType<typeof getPublicSupplier>>, TError = ErrorType<ErrorResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicSupplier>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicSupplierQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicSupplier>>> = ({ signal }) => getPublicSupplier(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicSupplier>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicSupplierQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicSupplier>>>
+export type GetPublicSupplierQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get one public supplier with their published products
+ */
+
+export function useGetPublicSupplier<TData = Awaited<ReturnType<typeof getPublicSupplier>>, TError = ErrorType<ErrorResponse>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicSupplier>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicSupplierQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListMySupplierQuoteRequestsUrl = () => {
+
+
+
+
+  return `/api/suppliers/me/quotes`
+}
+
+/**
+ * @summary List quote requests sent to the signed-in supplier
+ */
+export const listMySupplierQuoteRequests = async ( options?: Parameters<typeof customFetch>[1]): Promise<SupplierQuoteRequest[]> => {
+
+  return customFetch<SupplierQuoteRequest[]>(getListMySupplierQuoteRequestsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMySupplierQuoteRequestsQueryKey = () => {
+    return [
+    `/api/suppliers/me/quotes`
+    ] as const;
+    }
+
+
+export const getListMySupplierQuoteRequestsQueryOptions = <TData = Awaited<ReturnType<typeof listMySupplierQuoteRequests>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMySupplierQuoteRequests>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMySupplierQuoteRequestsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMySupplierQuoteRequests>>> = ({ signal }) => listMySupplierQuoteRequests({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMySupplierQuoteRequests>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMySupplierQuoteRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof listMySupplierQuoteRequests>>>
+export type ListMySupplierQuoteRequestsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List quote requests sent to the signed-in supplier
+ */
+
+export function useListMySupplierQuoteRequests<TData = Awaited<ReturnType<typeof listMySupplierQuoteRequests>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMySupplierQuoteRequests>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMySupplierQuoteRequestsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateSupplierQuoteRequestUrl = (id: string,) => {
+
+
+
+
+  return `/api/suppliers/${id}/quote`
+}
+
+/**
+ * @summary Send a quote request to a supplier, optionally about one product
+ */
+export const createSupplierQuoteRequest = async (id: string,
+    createSupplierQuoteRequestBody: CreateSupplierQuoteRequestBody, options?: Parameters<typeof customFetch>[1]): Promise<SupplierQuoteRequest> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SupplierQuoteRequest>(getCreateSupplierQuoteRequestUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createSupplierQuoteRequestBody)
+  }
+);}
+
+
+
+
+
+export const getCreateSupplierQuoteRequestMutationKey = () => ['createSupplierQuoteRequest'] as const;
+
+export const getCreateSupplierQuoteRequestMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSupplierQuoteRequest>>, TError,CreateSupplierQuoteRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSupplierQuoteRequest>>, TError,CreateSupplierQuoteRequestMutationVariables, TContext> => {
+
+const mutationKey = getCreateSupplierQuoteRequestMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSupplierQuoteRequest>>, CreateSupplierQuoteRequestMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  createSupplierQuoteRequest(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSupplierQuoteRequestMutationResult = NonNullable<Awaited<ReturnType<typeof createSupplierQuoteRequest>>>
+    export type CreateSupplierQuoteRequestMutationBody = BodyType<CreateSupplierQuoteRequestBody>
+    export type CreateSupplierQuoteRequestMutationError = ErrorType<ErrorResponse>
+    export type CreateSupplierQuoteRequestMutationVariables = {id: string;data: BodyType<CreateSupplierQuoteRequestBody>}
+
+    /**
+ * @summary Send a quote request to a supplier, optionally about one product
+ */
+export const useCreateSupplierQuoteRequest = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSupplierQuoteRequest>>, TError,CreateSupplierQuoteRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSupplierQuoteRequest>>,
+        TError,
+        CreateSupplierQuoteRequestMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateSupplierQuoteRequestMutationOptions(options));
+    }
+
 export const getListCategoriesUrl = () => {
 
 
@@ -148,11 +486,11 @@ export const getListCategoriesUrl = () => {
 }
 
 /**
- * @summary List construction categories
+ * @summary List marketplace material categories
  */
-export const listCategories = async ( options?: Parameters<typeof customFetch>[1]): Promise<Category[]> => {
+export const listCategories = async ( options?: Parameters<typeof customFetch>[1]): Promise<MarketplaceCategory[]> => {
 
-  return customFetch<Category[]>(getListCategoriesUrl(),
+  return customFetch<MarketplaceCategory[]>(getListCategoriesUrl(),
   {
     ...options,
     method: 'GET'
@@ -172,7 +510,7 @@ export const getListCategoriesQueryKey = () => {
     }
 
 
-export const getListCategoriesQueryOptions = <TData = Awaited<ReturnType<typeof listCategories>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCategories>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getListCategoriesQueryOptions = <TData = Awaited<ReturnType<typeof listCategories>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCategories>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -191,19 +529,103 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ListCategoriesQueryResult = NonNullable<Awaited<ReturnType<typeof listCategories>>>
-export type ListCategoriesQueryError = ErrorType<unknown>
+export type ListCategoriesQueryError = ErrorType<ErrorResponse>
 
 
 /**
- * @summary List construction categories
+ * @summary List marketplace material categories
  */
 
-export function useListCategories<TData = Awaited<ReturnType<typeof listCategories>>, TError = ErrorType<unknown>>(
+export function useListCategories<TData = Awaited<ReturnType<typeof listCategories>>, TError = ErrorType<ErrorResponse>>(
   options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCategories>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListCategoriesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListProductsUrl = (params?: ListProductsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/products?${stringifiedParams}` : `/api/products`
+}
+
+/**
+ * @summary List marketplace material products
+ */
+export const listProducts = async (params?: ListProductsParams, options?: Parameters<typeof customFetch>[1]): Promise<ProductPreview[]> => {
+
+  return customFetch<ProductPreview[]>(getListProductsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListProductsQueryKey = (params?: ListProductsParams,) => {
+    return [
+    `/api/products`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListProductsQueryOptions = <TData = Awaited<ReturnType<typeof listProducts>>, TError = ErrorType<ErrorResponse>>(params?: ListProductsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListProductsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listProducts>>> = ({ signal }) => listProducts(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListProductsQueryResult = NonNullable<Awaited<ReturnType<typeof listProducts>>>
+export type ListProductsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List marketplace material products
+ */
+
+export function useListProducts<TData = Awaited<ReturnType<typeof listProducts>>, TError = ErrorType<ErrorResponse>>(
+ params?: ListProductsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListProductsQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -225,7 +647,8 @@ export const getListFeaturedProfessionalsUrl = () => {
 }
 
 /**
- * @summary List featured professionals
+ * Phase 6D: database-backed. Returns real `professionals` rows newest first, using the same public read model as the discovery list, minus the contact fields. The endpoint returns an empty list when there are no professionals and never falls back to demo records. There is no `featured` column on the table, so "featured" is simply newest-first ordering rather than a manufactured flag.
+ * @summary List the most recently created real professional profiles
  */
 export const listFeaturedProfessionals = async ( options?: Parameters<typeof customFetch>[1]): Promise<ProfessionalPreview[]> => {
 
@@ -272,7 +695,7 @@ export type ListFeaturedProfessionalsQueryError = ErrorType<unknown>
 
 
 /**
- * @summary List featured professionals
+ * @summary List the most recently created real professional profiles
  */
 
 export function useListFeaturedProfessionals<TData = Awaited<ReturnType<typeof listFeaturedProfessionals>>, TError = ErrorType<unknown>>(
@@ -780,3 +1203,1146 @@ export const useCreateConstructionEstimate = <TError = ErrorType<ErrorResponse>,
       return useMutation(getCreateConstructionEstimateMutationOptions(options));
     }
 
+export const getListProjectBriefsUrl = () => {
+
+
+
+
+  return `/api/project-briefs`
+}
+
+/**
+ * @summary List the signed-in user's saved project briefs
+ */
+export const listProjectBriefs = async ( options?: Parameters<typeof customFetch>[1]): Promise<ProjectBrief[]> => {
+
+  return customFetch<ProjectBrief[]>(getListProjectBriefsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListProjectBriefsQueryKey = () => {
+    return [
+    `/api/project-briefs`
+    ] as const;
+    }
+
+
+export const getListProjectBriefsQueryOptions = <TData = Awaited<ReturnType<typeof listProjectBriefs>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listProjectBriefs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListProjectBriefsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listProjectBriefs>>> = ({ signal }) => listProjectBriefs({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listProjectBriefs>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListProjectBriefsQueryResult = NonNullable<Awaited<ReturnType<typeof listProjectBriefs>>>
+export type ListProjectBriefsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List the signed-in user's saved project briefs
+ */
+
+export function useListProjectBriefs<TData = Awaited<ReturnType<typeof listProjectBriefs>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listProjectBriefs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListProjectBriefsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateProjectBriefUrl = () => {
+
+
+
+
+  return `/api/project-briefs`
+}
+
+/**
+ * @summary Save a project brief for the signed-in user
+ */
+export const createProjectBrief = async (createProjectBriefBody: CreateProjectBriefBody, options?: Parameters<typeof customFetch>[1]): Promise<ProjectBrief> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProjectBrief>(getCreateProjectBriefUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createProjectBriefBody)
+  }
+);}
+
+
+
+
+
+export const getCreateProjectBriefMutationKey = () => ['createProjectBrief'] as const;
+
+export const getCreateProjectBriefMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProjectBrief>>, TError,CreateProjectBriefMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createProjectBrief>>, TError,CreateProjectBriefMutationVariables, TContext> => {
+
+const mutationKey = getCreateProjectBriefMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createProjectBrief>>, CreateProjectBriefMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createProjectBrief(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateProjectBriefMutationResult = NonNullable<Awaited<ReturnType<typeof createProjectBrief>>>
+    export type CreateProjectBriefMutationBody = BodyType<CreateProjectBriefBody>
+    export type CreateProjectBriefMutationError = ErrorType<ErrorResponse>
+    export type CreateProjectBriefMutationVariables = {data: BodyType<CreateProjectBriefBody>}
+
+    /**
+ * @summary Save a project brief for the signed-in user
+ */
+export const useCreateProjectBrief = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProjectBrief>>, TError,CreateProjectBriefMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createProjectBrief>>,
+        TError,
+        CreateProjectBriefMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateProjectBriefMutationOptions(options));
+    }
+
+export const getListPublicProfessionalsUrl = (params?: ListPublicProfessionalsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/professionals?${stringifiedParams}` : `/api/professionals`
+}
+
+/**
+ * @summary List public professional profiles
+ */
+export const listPublicProfessionals = async (params?: ListPublicProfessionalsParams, options?: Parameters<typeof customFetch>[1]): Promise<PublicProfessional[]> => {
+
+  return customFetch<PublicProfessional[]>(getListPublicProfessionalsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPublicProfessionalsQueryKey = (params?: ListPublicProfessionalsParams,) => {
+    return [
+    `/api/professionals`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListPublicProfessionalsQueryOptions = <TData = Awaited<ReturnType<typeof listPublicProfessionals>>, TError = ErrorType<ErrorResponse>>(params?: ListPublicProfessionalsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublicProfessionals>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPublicProfessionalsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPublicProfessionals>>> = ({ signal }) => listPublicProfessionals(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPublicProfessionals>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPublicProfessionalsQueryResult = NonNullable<Awaited<ReturnType<typeof listPublicProfessionals>>>
+export type ListPublicProfessionalsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List public professional profiles
+ */
+
+export function useListPublicProfessionals<TData = Awaited<ReturnType<typeof listPublicProfessionals>>, TError = ErrorType<ErrorResponse>>(
+ params?: ListPublicProfessionalsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublicProfessionals>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPublicProfessionalsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateProfessionalUrl = () => {
+
+
+
+
+  return `/api/professionals`
+}
+
+/**
+ * @summary Create the signed-in user's professional profile
+ */
+export const createProfessional = async (createProfessionalBody: CreateProfessionalBody, options?: Parameters<typeof customFetch>[1]): Promise<Professional> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Professional>(getCreateProfessionalUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createProfessionalBody)
+  }
+);}
+
+
+
+
+
+export const getCreateProfessionalMutationKey = () => ['createProfessional'] as const;
+
+export const getCreateProfessionalMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProfessional>>, TError,CreateProfessionalMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createProfessional>>, TError,CreateProfessionalMutationVariables, TContext> => {
+
+const mutationKey = getCreateProfessionalMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createProfessional>>, CreateProfessionalMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createProfessional(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateProfessionalMutationResult = NonNullable<Awaited<ReturnType<typeof createProfessional>>>
+    export type CreateProfessionalMutationBody = BodyType<CreateProfessionalBody>
+    export type CreateProfessionalMutationError = ErrorType<ErrorResponse>
+    export type CreateProfessionalMutationVariables = {data: BodyType<CreateProfessionalBody>}
+
+    /**
+ * @summary Create the signed-in user's professional profile
+ */
+export const useCreateProfessional = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProfessional>>, TError,CreateProfessionalMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createProfessional>>,
+        TError,
+        CreateProfessionalMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateProfessionalMutationOptions(options));
+    }
+
+export const getGetPublicProfessionalUrl = (id: string,) => {
+
+
+
+
+  return `/api/professionals/${id}`
+}
+
+/**
+ * @summary Get one public professional profile
+ */
+export const getPublicProfessional = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<PublicProfessional> => {
+
+  return customFetch<PublicProfessional>(getGetPublicProfessionalUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicProfessionalQueryKey = (id: string,) => {
+    return [
+    `/api/professionals/${id}`
+    ] as const;
+    }
+
+
+export const getGetPublicProfessionalQueryOptions = <TData = Awaited<ReturnType<typeof getPublicProfessional>>, TError = ErrorType<ErrorResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicProfessional>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicProfessionalQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicProfessional>>> = ({ signal }) => getPublicProfessional(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicProfessional>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicProfessionalQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicProfessional>>>
+export type GetPublicProfessionalQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get one public professional profile
+ */
+
+export function useGetPublicProfessional<TData = Awaited<ReturnType<typeof getPublicProfessional>>, TError = ErrorType<ErrorResponse>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicProfessional>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicProfessionalQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetMyProfessionalUrl = () => {
+
+
+
+
+  return `/api/professionals/me`
+}
+
+/**
+ * @summary Get the signed-in user's professional profile
+ */
+export const getMyProfessional = async ( options?: Parameters<typeof customFetch>[1]): Promise<Professional> => {
+
+  return customFetch<Professional>(getGetMyProfessionalUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMyProfessionalQueryKey = () => {
+    return [
+    `/api/professionals/me`
+    ] as const;
+    }
+
+
+export const getGetMyProfessionalQueryOptions = <TData = Awaited<ReturnType<typeof getMyProfessional>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyProfessional>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMyProfessionalQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyProfessional>>> = ({ signal }) => getMyProfessional({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyProfessional>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMyProfessionalQueryResult = NonNullable<Awaited<ReturnType<typeof getMyProfessional>>>
+export type GetMyProfessionalQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get the signed-in user's professional profile
+ */
+
+export function useGetMyProfessional<TData = Awaited<ReturnType<typeof getMyProfessional>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyProfessional>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMyProfessionalQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateMyProfessionalUrl = () => {
+
+
+
+
+  return `/api/professionals/me`
+}
+
+/**
+ * @summary Update the signed-in user's professional profile
+ */
+export const updateMyProfessional = async (updateProfessionalBody: UpdateProfessionalBody, options?: Parameters<typeof customFetch>[1]): Promise<Professional> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Professional>(getUpdateMyProfessionalUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateProfessionalBody)
+  }
+);}
+
+
+
+
+
+export const getUpdateMyProfessionalMutationKey = () => ['updateMyProfessional'] as const;
+
+export const getUpdateMyProfessionalMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMyProfessional>>, TError,UpdateMyProfessionalMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateMyProfessional>>, TError,UpdateMyProfessionalMutationVariables, TContext> => {
+
+const mutationKey = getUpdateMyProfessionalMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMyProfessional>>, UpdateMyProfessionalMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateMyProfessional(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateMyProfessionalMutationResult = NonNullable<Awaited<ReturnType<typeof updateMyProfessional>>>
+    export type UpdateMyProfessionalMutationBody = BodyType<UpdateProfessionalBody>
+    export type UpdateMyProfessionalMutationError = ErrorType<ErrorResponse>
+    export type UpdateMyProfessionalMutationVariables = {data: BodyType<UpdateProfessionalBody>}
+
+    /**
+ * @summary Update the signed-in user's professional profile
+ */
+export const useUpdateMyProfessional = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMyProfessional>>, TError,UpdateMyProfessionalMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateMyProfessional>>,
+        TError,
+        UpdateMyProfessionalMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateMyProfessionalMutationOptions(options));
+    }
+
+export const getListMyProfessionalProjectsUrl = () => {
+
+
+
+
+  return `/api/professionals/me/projects`
+}
+
+/**
+ * @summary List the signed-in professional's portfolio projects
+ */
+export const listMyProfessionalProjects = async ( options?: Parameters<typeof customFetch>[1]): Promise<ProfessionalProject[]> => {
+
+  return customFetch<ProfessionalProject[]>(getListMyProfessionalProjectsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMyProfessionalProjectsQueryKey = () => {
+    return [
+    `/api/professionals/me/projects`
+    ] as const;
+    }
+
+
+export const getListMyProfessionalProjectsQueryOptions = <TData = Awaited<ReturnType<typeof listMyProfessionalProjects>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyProfessionalProjects>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMyProfessionalProjectsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyProfessionalProjects>>> = ({ signal }) => listMyProfessionalProjects({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMyProfessionalProjects>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMyProfessionalProjectsQueryResult = NonNullable<Awaited<ReturnType<typeof listMyProfessionalProjects>>>
+export type ListMyProfessionalProjectsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List the signed-in professional's portfolio projects
+ */
+
+export function useListMyProfessionalProjects<TData = Awaited<ReturnType<typeof listMyProfessionalProjects>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyProfessionalProjects>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMyProfessionalProjectsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateMyProfessionalProjectUrl = () => {
+
+
+
+
+  return `/api/professionals/me/projects`
+}
+
+/**
+ * @summary Add a portfolio project to the signed-in professional
+ */
+export const createMyProfessionalProject = async (createProfessionalProjectBody: CreateProfessionalProjectBody, options?: Parameters<typeof customFetch>[1]): Promise<ProfessionalProject> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProfessionalProject>(getCreateMyProfessionalProjectUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createProfessionalProjectBody)
+  }
+);}
+
+
+
+
+
+export const getCreateMyProfessionalProjectMutationKey = () => ['createMyProfessionalProject'] as const;
+
+export const getCreateMyProfessionalProjectMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMyProfessionalProject>>, TError,CreateMyProfessionalProjectMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createMyProfessionalProject>>, TError,CreateMyProfessionalProjectMutationVariables, TContext> => {
+
+const mutationKey = getCreateMyProfessionalProjectMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createMyProfessionalProject>>, CreateMyProfessionalProjectMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createMyProfessionalProject(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateMyProfessionalProjectMutationResult = NonNullable<Awaited<ReturnType<typeof createMyProfessionalProject>>>
+    export type CreateMyProfessionalProjectMutationBody = BodyType<CreateProfessionalProjectBody>
+    export type CreateMyProfessionalProjectMutationError = ErrorType<ErrorResponse>
+    export type CreateMyProfessionalProjectMutationVariables = {data: BodyType<CreateProfessionalProjectBody>}
+
+    /**
+ * @summary Add a portfolio project to the signed-in professional
+ */
+export const useCreateMyProfessionalProject = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMyProfessionalProject>>, TError,CreateMyProfessionalProjectMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createMyProfessionalProject>>,
+        TError,
+        CreateMyProfessionalProjectMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateMyProfessionalProjectMutationOptions(options));
+    }
+
+export const getUpdateMyProfessionalProjectUrl = (id: string,) => {
+
+
+
+
+  return `/api/professionals/me/projects/${id}`
+}
+
+/**
+ * @summary Update one of the signed-in professional's portfolio projects
+ */
+export const updateMyProfessionalProject = async (id: string,
+    updateProfessionalProjectBody: UpdateProfessionalProjectBody, options?: Parameters<typeof customFetch>[1]): Promise<ProfessionalProject> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProfessionalProject>(getUpdateMyProfessionalProjectUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateProfessionalProjectBody)
+  }
+);}
+
+
+
+
+
+export const getUpdateMyProfessionalProjectMutationKey = () => ['updateMyProfessionalProject'] as const;
+
+export const getUpdateMyProfessionalProjectMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMyProfessionalProject>>, TError,UpdateMyProfessionalProjectMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateMyProfessionalProject>>, TError,UpdateMyProfessionalProjectMutationVariables, TContext> => {
+
+const mutationKey = getUpdateMyProfessionalProjectMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMyProfessionalProject>>, UpdateMyProfessionalProjectMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateMyProfessionalProject(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateMyProfessionalProjectMutationResult = NonNullable<Awaited<ReturnType<typeof updateMyProfessionalProject>>>
+    export type UpdateMyProfessionalProjectMutationBody = BodyType<UpdateProfessionalProjectBody>
+    export type UpdateMyProfessionalProjectMutationError = ErrorType<ErrorResponse>
+    export type UpdateMyProfessionalProjectMutationVariables = {id: string;data: BodyType<UpdateProfessionalProjectBody>}
+
+    /**
+ * @summary Update one of the signed-in professional's portfolio projects
+ */
+export const useUpdateMyProfessionalProject = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMyProfessionalProject>>, TError,UpdateMyProfessionalProjectMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateMyProfessionalProject>>,
+        TError,
+        UpdateMyProfessionalProjectMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateMyProfessionalProjectMutationOptions(options));
+    }
+
+export const getDeleteMyProfessionalProjectUrl = (id: string,) => {
+
+
+
+
+  return `/api/professionals/me/projects/${id}`
+}
+
+/**
+ * @summary Delete one of the signed-in professional's portfolio projects
+ */
+export const deleteMyProfessionalProject = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeleteMyProfessionalProjectUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteMyProfessionalProjectMutationKey = () => ['deleteMyProfessionalProject'] as const;
+
+export const getDeleteMyProfessionalProjectMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMyProfessionalProject>>, TError,DeleteMyProfessionalProjectMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteMyProfessionalProject>>, TError,DeleteMyProfessionalProjectMutationVariables, TContext> => {
+
+const mutationKey = getDeleteMyProfessionalProjectMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMyProfessionalProject>>, DeleteMyProfessionalProjectMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteMyProfessionalProject(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteMyProfessionalProjectMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMyProfessionalProject>>>
+
+    export type DeleteMyProfessionalProjectMutationError = ErrorType<ErrorResponse>
+    export type DeleteMyProfessionalProjectMutationVariables = {id: string}
+
+    /**
+ * @summary Delete one of the signed-in professional's portfolio projects
+ */
+export const useDeleteMyProfessionalProject = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMyProfessionalProject>>, TError,DeleteMyProfessionalProjectMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteMyProfessionalProject>>,
+        TError,
+        DeleteMyProfessionalProjectMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteMyProfessionalProjectMutationOptions(options));
+    }
+
+export const getListMyQuoteRequestsUrl = () => {
+
+
+
+
+  return `/api/professionals/me/quotes`
+}
+
+/**
+ * @summary List quote requests sent to the signed-in professional
+ */
+export const listMyQuoteRequests = async ( options?: Parameters<typeof customFetch>[1]): Promise<QuoteRequest[]> => {
+
+  return customFetch<QuoteRequest[]>(getListMyQuoteRequestsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMyQuoteRequestsQueryKey = () => {
+    return [
+    `/api/professionals/me/quotes`
+    ] as const;
+    }
+
+
+export const getListMyQuoteRequestsQueryOptions = <TData = Awaited<ReturnType<typeof listMyQuoteRequests>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyQuoteRequests>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMyQuoteRequestsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyQuoteRequests>>> = ({ signal }) => listMyQuoteRequests({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMyQuoteRequests>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMyQuoteRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof listMyQuoteRequests>>>
+export type ListMyQuoteRequestsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List quote requests sent to the signed-in professional
+ */
+
+export function useListMyQuoteRequests<TData = Awaited<ReturnType<typeof listMyQuoteRequests>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyQuoteRequests>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMyQuoteRequestsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateProfessionalQuoteRequestUrl = (id: string,) => {
+
+
+
+
+  return `/api/professionals/${id}/quote`
+}
+
+/**
+ * @summary Send a quote request to a professional
+ */
+export const createProfessionalQuoteRequest = async (id: string,
+    createQuoteRequestBody: CreateQuoteRequestBody, options?: Parameters<typeof customFetch>[1]): Promise<QuoteRequest> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<QuoteRequest>(getCreateProfessionalQuoteRequestUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createQuoteRequestBody)
+  }
+);}
+
+
+
+
+
+export const getCreateProfessionalQuoteRequestMutationKey = () => ['createProfessionalQuoteRequest'] as const;
+
+export const getCreateProfessionalQuoteRequestMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProfessionalQuoteRequest>>, TError,CreateProfessionalQuoteRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createProfessionalQuoteRequest>>, TError,CreateProfessionalQuoteRequestMutationVariables, TContext> => {
+
+const mutationKey = getCreateProfessionalQuoteRequestMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createProfessionalQuoteRequest>>, CreateProfessionalQuoteRequestMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  createProfessionalQuoteRequest(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateProfessionalQuoteRequestMutationResult = NonNullable<Awaited<ReturnType<typeof createProfessionalQuoteRequest>>>
+    export type CreateProfessionalQuoteRequestMutationBody = BodyType<CreateQuoteRequestBody>
+    export type CreateProfessionalQuoteRequestMutationError = ErrorType<ErrorResponse>
+    export type CreateProfessionalQuoteRequestMutationVariables = {id: string;data: BodyType<CreateQuoteRequestBody>}
+
+    /**
+ * @summary Send a quote request to a professional
+ */
+export const useCreateProfessionalQuoteRequest = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProfessionalQuoteRequest>>, TError,CreateProfessionalQuoteRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createProfessionalQuoteRequest>>,
+        TError,
+        CreateProfessionalQuoteRequestMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateProfessionalQuoteRequestMutationOptions(options));
+    }
+
+export const getListPublicProfessionalProjectsUrl = (id: string,) => {
+
+
+
+
+  return `/api/professionals/${id}/projects`
+}
+
+/**
+ * @summary List a professional's public portfolio projects
+ */
+export const listPublicProfessionalProjects = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<PublicProfessionalProject[]> => {
+
+  return customFetch<PublicProfessionalProject[]>(getListPublicProfessionalProjectsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPublicProfessionalProjectsQueryKey = (id: string,) => {
+    return [
+    `/api/professionals/${id}/projects`
+    ] as const;
+    }
+
+
+export const getListPublicProfessionalProjectsQueryOptions = <TData = Awaited<ReturnType<typeof listPublicProfessionalProjects>>, TError = ErrorType<ErrorResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublicProfessionalProjects>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPublicProfessionalProjectsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPublicProfessionalProjects>>> = ({ signal }) => listPublicProfessionalProjects(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPublicProfessionalProjects>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPublicProfessionalProjectsQueryResult = NonNullable<Awaited<ReturnType<typeof listPublicProfessionalProjects>>>
+export type ListPublicProfessionalProjectsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List a professional's public portfolio projects
+ */
+
+export function useListPublicProfessionalProjects<TData = Awaited<ReturnType<typeof listPublicProfessionalProjects>>, TError = ErrorType<ErrorResponse>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublicProfessionalProjects>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPublicProfessionalProjectsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}

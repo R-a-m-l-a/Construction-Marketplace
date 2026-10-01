@@ -9,9 +9,28 @@
 export interface ProductPreview {
   id: string;
   name: string;
+  /** @nullable */
+  description: string | null;
+  /** @nullable */
+  unit: string | null;
+  /**
+     * Price in PKR. Null means the supplier has not published a price.
+     * @nullable
+     */
+  price: number | null;
+  /**
+     * Rendered fallback for a null price: "Price on request".
+     * @nullable
+     */
+  priceLabel: string | null;
   category: string;
+  categoryId: string;
   supplier: string;
+  supplierId: string;
   city: string;
-  priceLabel: string;
-  description: string;
+  /** @nullable */
+  location: string | null;
+  /** @nullable */
+  imageUrl: string | null;
+  featured: boolean;
 }

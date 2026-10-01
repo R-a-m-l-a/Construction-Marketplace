@@ -14,14 +14,23 @@ import type { CreateConstructionEstimateBodyQuality } from './createConstruction
 export interface CreateConstructionEstimateBody {
   /** @minLength 2 */
   location: string;
-  /** @exclusiveMinimum 0 */
+  /**
+     * @maximum 250000
+     * @exclusiveMinimum 0
+     */
   plotSize: number;
   plotUnit: CreateConstructionEstimateBodyPlotUnit;
-  /** @minimum 1 */
+  /**
+     * @minimum 1
+     * @maximum 250000
+     */
   plotAreaSqFt: number;
   coveredAreaMode: CreateConstructionEstimateBodyCoveredAreaMode;
   coveredAreaBasis: CreateConstructionEstimateBodyCoveredAreaBasis;
-  /** @exclusiveMinimum 0 */
+  /**
+     * @maximum 250000
+     * @exclusiveMinimum 0
+     */
   coveredAreaValue: number;
   /**
      * @minimum 1
@@ -32,7 +41,10 @@ export interface CreateConstructionEstimateBody {
   floors: string;
   constructionType: CreateConstructionEstimateBodyConstructionType;
   quality: CreateConstructionEstimateBodyQuality;
-  /** @minimum 1 */
+  /**
+     * @minimum 1
+     * @maximum 250000
+     */
   totalCoveredAreaSqFt: number;
   /** @minimum 0 */
   greyMin: number;

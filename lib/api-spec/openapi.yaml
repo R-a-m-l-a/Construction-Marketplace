@@ -10,12 +10,18 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: marketplace
+    description: QadeerBuilds material marketplace
   - name: discovery
-    description: Buildora discovery content
+    description: QadeerBuilds discovery content
   - name: locations
     description: Free-first map and nearby place discovery
   - name: estimates
     description: Deterministic construction cost estimates
+  - name: projectBriefs
+    description: Authenticated persisted project briefs
+  - name: professionals
+    description: Professional and service provider profiles
 paths:
   /healthz:
     get:
@@ -30,28 +36,242 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
-  /categories:
+  /products/{id}:
     get:
-      operationId: listCategories
-      tags: [discovery]
-      summary: List construction categories
+      operationId: getPublicProduct
+      tags: [marketplace]
+      summary: Get one public marketplace product with its supplier and category
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
-          description: Construction categories
+          description: A public product, its category and its public supplier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPublicProductResponse"
+        "400":
+          description: Malformed product id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No such product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /suppliers/{id}:
+    get:
+      operationId: getPublicSupplier
+      tags: [marketplace]
+      summary: Get one public supplier with their published products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A public supplier and their published products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPublicSupplierResponse"
+        "400":
+          description: Malformed supplier id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No such supplier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load supplier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /suppliers/me/quotes:
+    get:
+      operationId: listMySupplierQuoteRequests
+      tags: [marketplace]
+      summary: List quote requests sent to the signed-in supplier
+      responses:
+        "200":
+          description: Quote requests sent to the signed-in supplier
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Category"
+                  $ref: "#/components/schemas/SupplierQuoteRequest"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No supplier profile exists for this account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load quote requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /suppliers/{id}/quote:
+    post:
+      operationId: createSupplierQuoteRequest
+      tags: [marketplace]
+      summary: Send a quote request to a supplier, optionally about one product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupplierQuoteRequestBody"
+      responses:
+        "201":
+          description: Quote request submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupplierQuoteRequest"
+        "400":
+          description: Invalid quote request, product id, or unknown supplier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No such supplier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to submit quote request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [marketplace]
+      summary: List marketplace material categories
+      responses:
+        "200":
+          description: Marketplace material categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MarketplaceCategory"
+        "500":
+          description: Unable to load categories
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /products:
+    get:
+      operationId: listProducts
+      tags: [marketplace]
+      summary: List marketplace material products
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 120
+          description: Free-text search across product name, description, unit, supplier, category, city and area. Multi-word queries match all words, and small spelling differences are tolerated when no exact match exists.
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 64
+          description: Filter by category id
+        - name: city
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 120
+          description: Filter by city
+        - name: supplier
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 64
+          description: Filter by supplier id
+      responses:
+        "200":
+          description: Marketplace products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductPreview"
+        "400":
+          description: Invalid category or supplier id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /professionals/featured:
     get:
       operationId: listFeaturedProfessionals
       tags: [discovery]
-      summary: List featured professionals
+      summary: List the most recently created real professional profiles
+      description: >-
+        Phase 6D: database-backed. Returns real `professionals` rows newest
+        first, using the same public read model as the discovery list, minus the
+        contact fields. The endpoint returns an empty list when there are no
+        professionals and never falls back to demo records. There is no
+        `featured` column on the table, so "featured" is simply newest-first
+        ordering rather than a manufactured flag.
       responses:
         "200":
-          description: Featured professionals
+          description: Real professional profiles, newest first
           content:
             application/json:
               schema:
@@ -149,7 +369,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Optional Buildora category filter
+          description: Optional QadeerBuilds category filter
       responses:
         "200":
           description: Nearby places
@@ -230,6 +450,517 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /project-briefs:
+    get:
+      operationId: listProjectBriefs
+      tags: [projectBriefs]
+      summary: List the signed-in user's saved project briefs
+      responses:
+        "200":
+          description: Saved project briefs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProjectBrief"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load project briefs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createProjectBrief
+      tags: [projectBriefs]
+      summary: Save a project brief for the signed-in user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectBriefBody"
+      responses:
+        "201":
+          description: Saved project brief
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectBrief"
+        "400":
+          description: Invalid project brief data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to save project brief
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /professionals:
+    get:
+      operationId: listPublicProfessionals
+      tags: [professionals]
+      summary: List public professional profiles
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 120
+          description: Free-text search across name, profession, category, services, city and area. Multi-word queries match all words, and small spelling differences are tolerated when no exact match exists.
+        - name: city
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 120
+          description: Filter by city
+        - name: location
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 200
+          description: Filter by area or location
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 80
+          description: Filter by trade category
+        - name: services
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 200
+          description: Filter by offered services
+      responses:
+        "200":
+          description: Public professional profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PublicProfessional"
+        "500":
+          description: Unable to load professionals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createProfessional
+      tags: [professionals]
+      summary: Create the signed-in user's professional profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProfessionalBody"
+      responses:
+        "201":
+          description: Created professional profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Professional"
+        "400":
+          description: Invalid professional data or profile already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to create professional profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /professionals/{id}:
+    get:
+      operationId: getPublicProfessional
+      tags: [professionals]
+      summary: Get one public professional profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A public professional profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicProfessional"
+        "404":
+          description: No such professional
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load professional
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /professionals/me:
+    get:
+      operationId: getMyProfessional
+      tags: [professionals]
+      summary: Get the signed-in user's professional profile
+      responses:
+        "200":
+          description: The signed-in user's professional profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Professional"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No professional profile exists yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load professional profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateMyProfessional
+      tags: [professionals]
+      summary: Update the signed-in user's professional profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfessionalBody"
+      responses:
+        "200":
+          description: Updated professional profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Professional"
+        "400":
+          description: Invalid professional data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No professional profile exists yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to update professional profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /professionals/me/projects:
+    get:
+      operationId: listMyProfessionalProjects
+      tags: [professionals]
+      summary: List the signed-in professional's portfolio projects
+      responses:
+        "200":
+          description: The signed-in professional's portfolio projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProfessionalProject"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No professional profile exists yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load portfolio projects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createMyProfessionalProject
+      tags: [professionals]
+      summary: Add a portfolio project to the signed-in professional
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProfessionalProjectBody"
+      responses:
+        "201":
+          description: Created portfolio project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfessionalProject"
+        "400":
+          description: Invalid portfolio project data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No professional profile exists yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to create portfolio project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /professionals/me/projects/{id}:
+    patch:
+      operationId: updateMyProfessionalProject
+      tags: [professionals]
+      summary: Update one of the signed-in professional's portfolio projects
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfessionalProjectBody"
+      responses:
+        "200":
+          description: Updated portfolio project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfessionalProject"
+        "400":
+          description: Invalid portfolio project data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No such portfolio project for the signed-in professional
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to update portfolio project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteMyProfessionalProject
+      tags: [professionals]
+      summary: Delete one of the signed-in professional's portfolio projects
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Portfolio project deleted
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No such portfolio project for the signed-in professional
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to delete portfolio project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /professionals/me/quotes:
+    get:
+      operationId: listMyQuoteRequests
+      tags: [professionals]
+      summary: List quote requests sent to the signed-in professional
+      responses:
+        "200":
+          description: Quote requests sent to the signed-in professional
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuoteRequest"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No professional profile exists yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load quote requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /professionals/{id}/quote:
+    post:
+      operationId: createProfessionalQuoteRequest
+      tags: [professionals]
+      summary: Send a quote request to a professional
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateQuoteRequestBody"
+      responses:
+        "201":
+          description: Quote request submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteRequest"
+        "400":
+          description: Invalid quote request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No such professional
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to submit quote request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /professionals/{id}/projects:
+    get:
+      operationId: listPublicProfessionalProjects
+      tags: [professionals]
+      summary: List a professional's public portfolio projects
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Public portfolio projects for a professional
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PublicProfessionalProject"
+        "404":
+          description: No such professional
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Unable to load portfolio projects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -255,26 +986,182 @@ components:
       required: [id, name, group, icon, description]
     ProfessionalPreview:
       type: object
+      description: >-
+        Phase 6D public preview of a real professional row. Mirrors the
+        `PublicProfessional` read model used by professional discovery, except
+        that `phone` and `whatsapp` are deliberately excluded: a listing preview
+        is not a contact surface, and the Call and WhatsApp actions live on the
+        public profile page. There is no `rating`, `yearsExperience` or
+        `verified` field, because none of those exist on the real schema and
+        manufacturing them would be inventing data.
       properties:
         id:
           type: string
         name:
           type: string
+        profession:
+          type: string
         category:
+          type: string
+        services:
           type: string
         city:
           type: string
-        rating:
-          type: number
-        yearsExperience:
-          type: integer
-        verified:
-          type: boolean
-        source:
+        location:
+          type: ["string", "null"]
+        logoUrl:
+          type: ["string", "null"]
+      required:
+        [id, name, profession, category, services, city, location, logoUrl]
+    PublicProduct:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
           type: string
         description:
+          type: ["string", "null"]
+        unit:
+          type: ["string", "null"]
+        price:
+          type: ["number", "null"]
+          description: Price in PKR. Null means the supplier has not published a price.
+        priceLabel:
+          type: ["string", "null"]
+          description: 'Rendered fallback for a null price: "Price on request".'
+        city:
           type: string
-      required: [id, name, category, city, rating, yearsExperience, verified, source, description]
+        location:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        featured:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        [id, name, description, unit, price, priceLabel, city, location, imageUrl, featured, createdAt]
+    PublicCategoryRef:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required: [id, name]
+    PublicSupplier:
+      type: object
+      description: >-
+        Public supplier view. `phone` and `whatsapp` are included
+        intentionally from Phase 6C so the WhatsApp and Call actions can open
+        the supplier's real stored number; they are never invented and the
+        action is simply not rendered when the value is absent. `clerkUserId`
+        and all other ownership fields remain private.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        city:
+          type: string
+        location:
+          type: ["string", "null"]
+        logoUrl:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        whatsapp:
+          type: ["string", "null"]
+      required:
+        [id, name, description, city, location, logoUrl, phone, whatsapp]
+    GetPublicProductResponse:
+      type: object
+      properties:
+        product:
+          $ref: "#/components/schemas/PublicProduct"
+        category:
+          $ref: "#/components/schemas/PublicCategoryRef"
+        supplier:
+          $ref: "#/components/schemas/PublicSupplier"
+      required: [product, category, supplier]
+    CreateSupplierQuoteRequestBody:
+      type: object
+      properties:
+        productId:
+          type: string
+          maxLength: 64
+          description: Optional material the enquiry is about. Must be a product belonging to the supplier in the URL.
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        size:
+          type: string
+          minLength: 2
+          maxLength: 120
+        details:
+          type: string
+          minLength: 2
+          maxLength: 2000
+        imageUrls:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            maxLength: 2048
+          description: 'Optional absolute http or https image URLs, up to five. Non-http(s) schemes such as javascript and data URIs are rejected.'
+      required: [name, email, size, details]
+    SupplierQuoteRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        productId:
+          type: ["string", "null"]
+        name:
+          type: string
+        email:
+          type: string
+        size:
+          type: string
+        details:
+          type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, productId, name, email, size, details, imageUrls, createdAt]
+    GetPublicSupplierResponse:
+      type: object
+      properties:
+        supplier:
+          $ref: "#/components/schemas/PublicSupplier"
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductPreview"
+      required: [supplier, products]
+    MarketplaceCategory:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+      required: [id, name, description]
     ProductPreview:
       type: object
       properties:
@@ -282,28 +1169,76 @@ components:
           type: string
         name:
           type: string
+        description:
+          type: ["string", "null"]
+        unit:
+          type: ["string", "null"]
+        price:
+          type: ["number", "null"]
+          description: Price in PKR. Null means the supplier has not published a price.
+        priceLabel:
+          type: ["string", "null"]
+          description: 'Rendered fallback for a null price: "Price on request".'
         category:
+          type: string
+        categoryId:
           type: string
         supplier:
           type: string
+        supplierId:
+          type: string
         city:
           type: string
-        priceLabel:
-          type: string
-        description:
-          type: string
-      required: [id, name, category, supplier, city, priceLabel, description]
+        location:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        featured:
+          type: boolean
+      required:
+        [
+          id,
+          name,
+          description,
+          unit,
+          price,
+          priceLabel,
+          category,
+          categoryId,
+          supplier,
+          supplierId,
+          city,
+          location,
+          imageUrl,
+          featured,
+        ]
     DiscoveryStats:
       type: object
+      description: >-
+        Phase 6D: every value is a real database count. `marketplaceItems` is
+        the number of published products. `professionalCategories` is the
+        number of distinct `professionals.category` values. `citiesCovered` is
+        the number of distinct `professionals.city` values, which is the
+        narrowest reading that matches the homepage label "cities covered"
+        sitting beside "trade categories": both describe professional coverage.
+        `demoNotice` remains as a required string so the generated client type
+        does not change, but it is now a plain status string rather than a
+        warning about fictional data.
       properties:
         marketplaceItems:
           type: integer
+          description: Count of published products.
         professionalCategories:
           type: integer
+          description: Count of distinct categories across real professionals.
         citiesCovered:
           type: integer
+          description: Count of distinct cities across real professionals.
         demoNotice:
           type: string
+          description: >-
+            Retained for client compatibility. No longer announces demo data,
+            since all discovery data is now database-backed.
       required: [marketplaceItems, professionalCategories, citiesCovered, demoNotice]
     LocationResult:
       type: object
@@ -370,12 +1305,14 @@ components:
         plotSize:
           type: number
           exclusiveMinimum: 0
+          maximum: 250000
         plotUnit:
           type: string
           enum: [marla, kanal, squareFeet, squareYards]
         plotAreaSqFt:
           type: integer
           minimum: 1
+          maximum: 250000
         coveredAreaMode:
           type: string
           enum: [squareFeet, percentage]
@@ -385,6 +1322,7 @@ components:
         coveredAreaValue:
           type: number
           exclusiveMinimum: 0
+          maximum: 250000
         floorCount:
           type: integer
           minimum: 1
@@ -401,6 +1339,7 @@ components:
         totalCoveredAreaSqFt:
           type: integer
           minimum: 1
+          maximum: 250000
         greyMin:
           type: integer
           minimum: 0
@@ -457,4 +1396,283 @@ components:
               type: string
               format: date-time
           required: [id, createdAt]
+    CreateProjectBriefBody:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        projectType:
+          type: string
+          enum: [New home, Renovation, Commercial space, Something else]
+        location:
+          type: string
+          minLength: 2
+          maxLength: 120
+        budget:
+          type: string
+          enum:
+            - Under PKR 5M
+            - PKR 5M - 15M
+            - PKR 15M - 30M
+            - PKR 30M or more
+            - Not sure yet
+        timeline:
+          type: string
+          enum:
+            - As soon as possible
+            - Within 1-3 months
+            - Within 3-6 months
+            - Within 6-12 months
+            - Just planning
+        description:
+          type: string
+          minLength: 1
+          maxLength: 5000
+      required: [name, projectType, location, budget, timeline, description]
+    ProjectBrief:
+      allOf:
+        - $ref: "#/components/schemas/CreateProjectBriefBody"
+        - type: object
+          properties:
+            id:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+          required: [id, createdAt]
+    CreateProfessionalBody:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        profession:
+          type: string
+          minLength: 2
+          maxLength: 80
+        category:
+          type: string
+          minLength: 2
+          maxLength: 80
+        services:
+          type: string
+          minLength: 2
+          maxLength: 1000
+        bio:
+          type: string
+          maxLength: 2000
+        city:
+          type: string
+          minLength: 2
+          maxLength: 120
+        location:
+          type: string
+          maxLength: 200
+        logoUrl:
+          type: string
+          maxLength: 2048
+          description: 'Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.'
+        phone:
+          type: string
+          maxLength: 32
+        whatsapp:
+          type: string
+          maxLength: 32
+      required: [name, profession, category, services, city]
+    UpdateProfessionalBody:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        profession:
+          type: string
+          minLength: 2
+          maxLength: 80
+        category:
+          type: string
+          minLength: 2
+          maxLength: 80
+        services:
+          type: string
+          minLength: 2
+          maxLength: 1000
+        bio:
+          type: string
+          maxLength: 2000
+        city:
+          type: string
+          minLength: 2
+          maxLength: 120
+        location:
+          type: string
+          maxLength: 200
+        logoUrl:
+          type: string
+          maxLength: 2048
+          description: 'Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.'
+        phone:
+          type: string
+          maxLength: 32
+        whatsapp:
+          type: string
+          maxLength: 32
+    Professional:
+      allOf:
+        - $ref: "#/components/schemas/CreateProfessionalBody"
+        - type: object
+          properties:
+            id:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+          required: [id, createdAt, updatedAt]
+    PublicProfessional:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        profession:
+          type: string
+        category:
+          type: string
+        services:
+          type: string
+        city:
+          type: string
+        location:
+          type: ["string", "null"]
+        logoUrl:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+          description: 'Public contact number, entered by the professional on their own profile. Used for the Call now action.'
+        whatsapp:
+          type: ["string", "null"]
+          description: 'Public WhatsApp number, entered by the professional on their own profile. Used for the WhatsApp action.'
+      required:
+        [id, name, profession, category, services, city, location, logoUrl, phone, whatsapp]
+    CreateProfessionalProjectBody:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 2
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 2000
+        location:
+          type: string
+          maxLength: 200
+        imageUrl:
+          type: string
+          maxLength: 2048
+          description: 'Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.'
+    UpdateProfessionalProjectBody:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 2
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 2000
+        location:
+          type: string
+          maxLength: 200
+        imageUrl:
+          type: string
+          maxLength: 2048
+          description: 'Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.'
+    ProfessionalProject:
+      allOf:
+        - $ref: "#/components/schemas/CreateProfessionalProjectBody"
+        - type: object
+          properties:
+            id:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+          required: [id, createdAt, updatedAt]
+    PublicProfessionalProject:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        location:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, title, description, location, imageUrl, createdAt]
+    CreateQuoteRequestBody:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        size:
+          type: string
+          minLength: 2
+          maxLength: 120
+        details:
+          type: string
+          minLength: 2
+          maxLength: 2000
+        imageUrls:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            maxLength: 2048
+          description: 'Optional absolute http or https image URLs, up to five. Non-http(s) schemes such as javascript and data URIs are rejected.'
+      required: [name, email, size, details]
+    QuoteRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        size:
+          type: string
+        details:
+          type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, email, size, details, imageUrls, createdAt]
 

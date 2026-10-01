@@ -17,32 +17,173 @@ export interface Category {
   description: string;
 }
 
+/**
+ * Phase 6D public preview of a real professional row. Mirrors the `PublicProfessional` read model used by professional discovery, except that `phone` and `whatsapp` are deliberately excluded: a listing preview is not a contact surface, and the Call and WhatsApp actions live on the public profile page. There is no `rating`, `yearsExperience` or `verified` field, because none of those exist on the real schema and manufacturing them would be inventing data.
+ */
 export interface ProfessionalPreview {
   id: string;
   name: string;
+  profession: string;
   category: string;
+  services: string;
   city: string;
-  rating: number;
-  yearsExperience: number;
-  verified: boolean;
-  source: string;
-  description: string;
+  /** @nullable */
+  location: string | null;
+  /** @nullable */
+  logoUrl: string | null;
+}
+
+export interface PublicProduct {
+  id: string;
+  name: string;
+  /** @nullable */
+  description: string | null;
+  /** @nullable */
+  unit: string | null;
+  /**
+     * Price in PKR. Null means the supplier has not published a price.
+     * @nullable
+     */
+  price: number | null;
+  /**
+     * Rendered fallback for a null price: "Price on request".
+     * @nullable
+     */
+  priceLabel: string | null;
+  city: string;
+  /** @nullable */
+  location: string | null;
+  /** @nullable */
+  imageUrl: string | null;
+  featured: boolean;
+  createdAt: string;
+}
+
+export interface PublicCategoryRef {
+  id: string;
+  name: string;
+}
+
+/**
+ * Public supplier view. `phone` and `whatsapp` are included intentionally from Phase 6C so the WhatsApp and Call actions can open the supplier's real stored number; they are never invented and the action is simply not rendered when the value is absent. `clerkUserId` and all other ownership fields remain private.
+ */
+export interface PublicSupplier {
+  id: string;
+  name: string;
+  /** @nullable */
+  description: string | null;
+  city: string;
+  /** @nullable */
+  location: string | null;
+  /** @nullable */
+  logoUrl: string | null;
+  /** @nullable */
+  phone: string | null;
+  /** @nullable */
+  whatsapp: string | null;
+}
+
+export interface GetPublicProductResponse {
+  product: PublicProduct;
+  category: PublicCategoryRef;
+  supplier: PublicSupplier;
+}
+
+export interface CreateSupplierQuoteRequestBody {
+  /**
+     * Optional material the enquiry is about. Must be a product belonging to the supplier in the URL.
+     * @maxLength 64
+     */
+  productId?: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  name: string;
+  /** @maxLength 254 */
+  email: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  size: string;
+  /**
+     * @minLength 2
+     * @maxLength 2000
+     */
+  details: string;
+  /**
+     * Optional absolute http or https image URLs, up to five. Non-http(s) schemes such as javascript and data URIs are rejected.
+     * @maxItems 5
+     * @items.maxLength 2048
+     */
+  imageUrls?: string[];
+}
+
+export interface SupplierQuoteRequest {
+  id: string;
+  /** @nullable */
+  productId: string | null;
+  name: string;
+  email: string;
+  size: string;
+  details: string;
+  imageUrls: string[];
+  createdAt: string;
 }
 
 export interface ProductPreview {
   id: string;
   name: string;
+  /** @nullable */
+  description: string | null;
+  /** @nullable */
+  unit: string | null;
+  /**
+     * Price in PKR. Null means the supplier has not published a price.
+     * @nullable
+     */
+  price: number | null;
+  /**
+     * Rendered fallback for a null price: "Price on request".
+     * @nullable
+     */
+  priceLabel: string | null;
   category: string;
+  categoryId: string;
   supplier: string;
+  supplierId: string;
   city: string;
-  priceLabel: string;
-  description: string;
+  /** @nullable */
+  location: string | null;
+  /** @nullable */
+  imageUrl: string | null;
+  featured: boolean;
 }
 
+export interface GetPublicSupplierResponse {
+  supplier: PublicSupplier;
+  products: ProductPreview[];
+}
+
+export interface MarketplaceCategory {
+  id: string;
+  name: string;
+  /** @nullable */
+  description: string | null;
+}
+
+/**
+ * Phase 6D: every value is a real database count. `marketplaceItems` is the number of published products. `professionalCategories` is the number of distinct `professionals.category` values. `citiesCovered` is the number of distinct `professionals.city` values, which is the narrowest reading that matches the homepage label "cities covered" sitting beside "trade categories": both describe professional coverage. `demoNotice` remains as a required string so the generated client type does not change, but it is now a plain status string rather than a warning about fictional data.
+ */
 export interface DiscoveryStats {
+  /** Count of published products. */
   marketplaceItems: number;
+  /** Count of distinct categories across real professionals. */
   professionalCategories: number;
+  /** Count of distinct cities across real professionals. */
   citiesCovered: number;
+  /** Retained for client compatibility. No longer announces demo data, since all discovery data is now database-backed. */
   demoNotice: string;
 }
 
@@ -128,14 +269,23 @@ export const CreateConstructionEstimateBodyQuality = {
 export interface CreateConstructionEstimateBody {
   /** @minLength 2 */
   location: string;
-  /** @exclusiveMinimum 0 */
+  /**
+     * @maximum 250000
+     * @exclusiveMinimum 0
+     */
   plotSize: number;
   plotUnit: CreateConstructionEstimateBodyPlotUnit;
-  /** @minimum 1 */
+  /**
+     * @minimum 1
+     * @maximum 250000
+     */
   plotAreaSqFt: number;
   coveredAreaMode: CreateConstructionEstimateBodyCoveredAreaMode;
   coveredAreaBasis: CreateConstructionEstimateBodyCoveredAreaBasis;
-  /** @exclusiveMinimum 0 */
+  /**
+     * @maximum 250000
+     * @exclusiveMinimum 0
+     */
   coveredAreaValue: number;
   /**
      * @minimum 1
@@ -146,7 +296,10 @@ export interface CreateConstructionEstimateBody {
   floors: string;
   constructionType: CreateConstructionEstimateBodyConstructionType;
   quality: CreateConstructionEstimateBodyQuality;
-  /** @minimum 1 */
+  /**
+     * @minimum 1
+     * @maximum 250000
+     */
   totalCoveredAreaSqFt: number;
   /** @minimum 0 */
   greyMin: number;
@@ -169,6 +322,286 @@ export interface CreateConstructionEstimateBody {
 export type ConstructionEstimate = CreateConstructionEstimateBody & {
   id: string;
   createdAt: string;
+};
+
+export type CreateProjectBriefBodyProjectType = typeof CreateProjectBriefBodyProjectType[keyof typeof CreateProjectBriefBodyProjectType];
+
+
+export const CreateProjectBriefBodyProjectType = {
+  New_home: 'New home',
+  Renovation: 'Renovation',
+  Commercial_space: 'Commercial space',
+  Something_else: 'Something else',
+} as const;
+
+export type CreateProjectBriefBodyBudget = typeof CreateProjectBriefBodyBudget[keyof typeof CreateProjectBriefBodyBudget];
+
+
+export const CreateProjectBriefBodyBudget = {
+  Under_PKR_5M: 'Under PKR 5M',
+  'PKR_5M_-_15M': 'PKR 5M - 15M',
+  'PKR_15M_-_30M': 'PKR 15M - 30M',
+  PKR_30M_or_more: 'PKR 30M or more',
+  Not_sure_yet: 'Not sure yet',
+} as const;
+
+export type CreateProjectBriefBodyTimeline = typeof CreateProjectBriefBodyTimeline[keyof typeof CreateProjectBriefBodyTimeline];
+
+
+export const CreateProjectBriefBodyTimeline = {
+  As_soon_as_possible: 'As soon as possible',
+  'Within_1-3_months': 'Within 1-3 months',
+  'Within_3-6_months': 'Within 3-6 months',
+  'Within_6-12_months': 'Within 6-12 months',
+  Just_planning: 'Just planning',
+} as const;
+
+export interface CreateProjectBriefBody {
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  name: string;
+  projectType: CreateProjectBriefBodyProjectType;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  location: string;
+  budget: CreateProjectBriefBodyBudget;
+  timeline: CreateProjectBriefBodyTimeline;
+  /**
+     * @minLength 1
+     * @maxLength 5000
+     */
+  description: string;
+}
+
+export type ProjectBrief = CreateProjectBriefBody & {
+  id: string;
+  createdAt: string;
+};
+
+export interface CreateProfessionalBody {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  name: string;
+  /**
+     * @minLength 2
+     * @maxLength 80
+     */
+  profession: string;
+  /**
+     * @minLength 2
+     * @maxLength 80
+     */
+  category: string;
+  /**
+     * @minLength 2
+     * @maxLength 1000
+     */
+  services: string;
+  /** @maxLength 2000 */
+  bio?: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  city: string;
+  /** @maxLength 200 */
+  location?: string;
+  /**
+     * Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.
+     * @maxLength 2048
+     */
+  logoUrl?: string;
+  /** @maxLength 32 */
+  phone?: string;
+  /** @maxLength 32 */
+  whatsapp?: string;
+}
+
+export interface UpdateProfessionalBody {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  name?: string;
+  /**
+     * @minLength 2
+     * @maxLength 80
+     */
+  profession?: string;
+  /**
+     * @minLength 2
+     * @maxLength 80
+     */
+  category?: string;
+  /**
+     * @minLength 2
+     * @maxLength 1000
+     */
+  services?: string;
+  /** @maxLength 2000 */
+  bio?: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  city?: string;
+  /** @maxLength 200 */
+  location?: string;
+  /**
+     * Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.
+     * @maxLength 2048
+     */
+  logoUrl?: string;
+  /** @maxLength 32 */
+  phone?: string;
+  /** @maxLength 32 */
+  whatsapp?: string;
+}
+
+export type Professional = CreateProfessionalBody & {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export interface PublicProfessional {
+  id: string;
+  name: string;
+  profession: string;
+  category: string;
+  services: string;
+  city: string;
+  /** @nullable */
+  location: string | null;
+  /** @nullable */
+  logoUrl: string | null;
+  /**
+     * Public contact number, entered by the professional on their own profile. Used for the Call now action.
+     * @nullable
+     */
+  phone: string | null;
+  /**
+     * Public WhatsApp number, entered by the professional on their own profile. Used for the WhatsApp action.
+     * @nullable
+     */
+  whatsapp: string | null;
+}
+
+export interface CreateProfessionalProjectBody {
+  /**
+     * @minLength 2
+     * @maxLength 160
+     */
+  title?: string;
+  /** @maxLength 2000 */
+  description?: string;
+  /** @maxLength 200 */
+  location?: string;
+  /**
+     * Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.
+     * @maxLength 2048
+     */
+  imageUrl?: string;
+}
+
+export interface UpdateProfessionalProjectBody {
+  /**
+     * @minLength 2
+     * @maxLength 160
+     */
+  title?: string;
+  /** @maxLength 2000 */
+  description?: string;
+  /** @maxLength 200 */
+  location?: string;
+  /**
+     * Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.
+     * @maxLength 2048
+     */
+  imageUrl?: string;
+}
+
+export type ProfessionalProject = CreateProfessionalProjectBody & {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export interface PublicProfessionalProject {
+  id: string;
+  title: string;
+  /** @nullable */
+  description: string | null;
+  /** @nullable */
+  location: string | null;
+  /** @nullable */
+  imageUrl: string | null;
+  createdAt: string;
+}
+
+export interface CreateQuoteRequestBody {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  name: string;
+  /** @maxLength 254 */
+  email: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  size: string;
+  /**
+     * @minLength 2
+     * @maxLength 2000
+     */
+  details: string;
+  /**
+     * Optional absolute http or https image URLs, up to five. Non-http(s) schemes such as javascript and data URIs are rejected.
+     * @maxItems 5
+     * @items.maxLength 2048
+     */
+  imageUrls?: string[];
+}
+
+export interface QuoteRequest {
+  id: string;
+  name: string;
+  email: string;
+  size: string;
+  details: string;
+  imageUrls: string[];
+  createdAt: string;
+}
+
+export type ListProductsParams = {
+/**
+ * Free-text search across product name, description, unit, supplier, category, city and area. Multi-word queries match all words, and small spelling differences are tolerated when no exact match exists.
+ * @maxLength 120
+ */
+query?: string;
+/**
+ * Filter by category id
+ * @maxLength 64
+ */
+category?: string;
+/**
+ * Filter by city
+ * @maxLength 120
+ */
+city?: string;
+/**
+ * Filter by supplier id
+ * @maxLength 64
+ */
+supplier?: string;
 };
 
 export type GeocodeLocationParams = {
@@ -196,8 +629,35 @@ longitude: number;
  */
 radiusMeters?: number;
 /**
- * Optional Buildora category filter
+ * Optional QadeerBuilds category filter
  */
 category?: string;
 };
 
+export type ListPublicProfessionalsParams = {
+/**
+ * Free-text search across name, profession, category, services, city and area. Multi-word queries match all words, and small spelling differences are tolerated when no exact match exists.
+ * @maxLength 120
+ */
+query?: string;
+/**
+ * Filter by city
+ * @maxLength 120
+ */
+city?: string;
+/**
+ * Filter by area or location
+ * @maxLength 200
+ */
+location?: string;
+/**
+ * Filter by trade category
+ * @maxLength 80
+ */
+category?: string;
+/**
+ * Filter by offered services
+ * @maxLength 200
+ */
+services?: string;
+};

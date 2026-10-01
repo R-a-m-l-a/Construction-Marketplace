@@ -18,32 +18,207 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * @summary List construction categories
+ * @summary Get one public marketplace product with its supplier and category
+ */
+export const GetPublicProductParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetPublicProductResponse = zod.object({
+  "product": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullable(),
+  "unit": zod.string().nullable(),
+  "price": zod.number().nullable().describe('Price in PKR. Null means the supplier has not published a price.'),
+  "priceLabel": zod.string().nullable().describe('Rendered fallback for a null price: "Price on request".'),
+  "city": zod.string(),
+  "location": zod.string().nullable(),
+  "imageUrl": zod.string().nullable(),
+  "featured": zod.boolean(),
+  "createdAt": zod.coerce.date()
+}),
+  "category": zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}),
+  "supplier": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullable(),
+  "city": zod.string(),
+  "location": zod.string().nullable(),
+  "logoUrl": zod.string().nullable(),
+  "phone": zod.string().nullable(),
+  "whatsapp": zod.string().nullable()
+}).describe('Public supplier view. `phone` and `whatsapp` are included intentionally from Phase 6C so the WhatsApp and Call actions can open the supplier\'s real stored number; they are never invented and the action is simply not rendered when the value is absent. `clerkUserId` and all other ownership fields remain private.')
+})
+
+
+/**
+ * @summary Get one public supplier with their published products
+ */
+export const GetPublicSupplierParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetPublicSupplierResponse = zod.object({
+  "supplier": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullable(),
+  "city": zod.string(),
+  "location": zod.string().nullable(),
+  "logoUrl": zod.string().nullable(),
+  "phone": zod.string().nullable(),
+  "whatsapp": zod.string().nullable()
+}).describe('Public supplier view. `phone` and `whatsapp` are included intentionally from Phase 6C so the WhatsApp and Call actions can open the supplier\'s real stored number; they are never invented and the action is simply not rendered when the value is absent. `clerkUserId` and all other ownership fields remain private.'),
+  "products": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullable(),
+  "unit": zod.string().nullable(),
+  "price": zod.number().nullable().describe('Price in PKR. Null means the supplier has not published a price.'),
+  "priceLabel": zod.string().nullable().describe('Rendered fallback for a null price: "Price on request".'),
+  "category": zod.string(),
+  "categoryId": zod.string(),
+  "supplier": zod.string(),
+  "supplierId": zod.string(),
+  "city": zod.string(),
+  "location": zod.string().nullable(),
+  "imageUrl": zod.string().nullable(),
+  "featured": zod.boolean()
+}))
+})
+
+
+/**
+ * @summary List quote requests sent to the signed-in supplier
+ */
+export const ListMySupplierQuoteRequestsResponseItem = zod.object({
+  "id": zod.string(),
+  "productId": zod.string().nullable(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "size": zod.string(),
+  "details": zod.string(),
+  "imageUrls": zod.array(zod.string()),
+  "createdAt": zod.coerce.date()
+})
+export const ListMySupplierQuoteRequestsResponse = zod.array(ListMySupplierQuoteRequestsResponseItem)
+
+
+/**
+ * @summary Send a quote request to a supplier, optionally about one product
+ */
+export const CreateSupplierQuoteRequestParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const createSupplierQuoteRequestBodyProductIdMax = 64;
+
+export const createSupplierQuoteRequestBodyNameMin = 2;
+export const createSupplierQuoteRequestBodyNameMax = 120;
+
+export const createSupplierQuoteRequestBodyEmailMax = 254;
+
+export const createSupplierQuoteRequestBodySizeMin = 2;
+export const createSupplierQuoteRequestBodySizeMax = 120;
+
+export const createSupplierQuoteRequestBodyDetailsMin = 2;
+export const createSupplierQuoteRequestBodyDetailsMax = 2000;
+
+export const createSupplierQuoteRequestBodyImageUrlsItemMax = 2048;
+
+export const createSupplierQuoteRequestBodyImageUrlsMax = 5;
+
+
+
+export const CreateSupplierQuoteRequestBody = zod.object({
+  "productId": zod.string().max(createSupplierQuoteRequestBodyProductIdMax).optional().describe('Optional material the enquiry is about. Must be a product belonging to the supplier in the URL.'),
+  "name": zod.string().min(createSupplierQuoteRequestBodyNameMin).max(createSupplierQuoteRequestBodyNameMax),
+  "email": zod.string().email().max(createSupplierQuoteRequestBodyEmailMax),
+  "size": zod.string().min(createSupplierQuoteRequestBodySizeMin).max(createSupplierQuoteRequestBodySizeMax),
+  "details": zod.string().min(createSupplierQuoteRequestBodyDetailsMin).max(createSupplierQuoteRequestBodyDetailsMax),
+  "imageUrls": zod.array(zod.string().max(createSupplierQuoteRequestBodyImageUrlsItemMax)).max(createSupplierQuoteRequestBodyImageUrlsMax).optional().describe('Optional absolute http or https image URLs, up to five. Non-http(s) schemes such as javascript and data URIs are rejected.')
+})
+
+export const CreateSupplierQuoteRequestResponse = zod.object({
+  "id": zod.string(),
+  "productId": zod.string().nullable(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "size": zod.string(),
+  "details": zod.string(),
+  "imageUrls": zod.array(zod.string()),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List marketplace material categories
  */
 export const ListCategoriesResponseItem = zod.object({
   "id": zod.string(),
   "name": zod.string(),
-  "group": zod.string(),
-  "icon": zod.string(),
-  "description": zod.string()
+  "description": zod.string().nullable()
 })
 export const ListCategoriesResponse = zod.array(ListCategoriesResponseItem)
 
 
 /**
- * @summary List featured professionals
+ * @summary List marketplace material products
+ */
+export const listProductsQueryQueryMax = 120;
+
+export const listProductsQueryCategoryMax = 64;
+
+export const listProductsQueryCityMax = 120;
+
+export const listProductsQuerySupplierMax = 64;
+
+
+
+export const ListProductsQueryParams = zod.object({
+  "query": zod.coerce.string().max(listProductsQueryQueryMax).optional().describe('Free-text search across product name, description, unit, supplier, category, city and area. Multi-word queries match all words, and small spelling differences are tolerated when no exact match exists.'),
+  "category": zod.coerce.string().max(listProductsQueryCategoryMax).optional().describe('Filter by category id'),
+  "city": zod.coerce.string().max(listProductsQueryCityMax).optional().describe('Filter by city'),
+  "supplier": zod.coerce.string().max(listProductsQuerySupplierMax).optional().describe('Filter by supplier id')
+})
+
+export const ListProductsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullable(),
+  "unit": zod.string().nullable(),
+  "price": zod.number().nullable().describe('Price in PKR. Null means the supplier has not published a price.'),
+  "priceLabel": zod.string().nullable().describe('Rendered fallback for a null price: "Price on request".'),
+  "category": zod.string(),
+  "categoryId": zod.string(),
+  "supplier": zod.string(),
+  "supplierId": zod.string(),
+  "city": zod.string(),
+  "location": zod.string().nullable(),
+  "imageUrl": zod.string().nullable(),
+  "featured": zod.boolean()
+})
+export const ListProductsResponse = zod.array(ListProductsResponseItem)
+
+
+/**
+ * Phase 6D: database-backed. Returns real `professionals` rows newest first, using the same public read model as the discovery list, minus the contact fields. The endpoint returns an empty list when there are no professionals and never falls back to demo records. There is no `featured` column on the table, so "featured" is simply newest-first ordering rather than a manufactured flag.
+ * @summary List the most recently created real professional profiles
  */
 export const ListFeaturedProfessionalsResponseItem = zod.object({
   "id": zod.string(),
   "name": zod.string(),
+  "profession": zod.string(),
   "category": zod.string(),
+  "services": zod.string(),
   "city": zod.string(),
-  "rating": zod.number(),
-  "yearsExperience": zod.number().int(),
-  "verified": zod.boolean(),
-  "source": zod.string(),
-  "description": zod.string()
-})
+  "location": zod.string().nullable(),
+  "logoUrl": zod.string().nullable()
+}).describe('Phase 6D public preview of a real professional row. Mirrors the `PublicProfessional` read model used by professional discovery, except that `phone` and `whatsapp` are deliberately excluded: a listing preview is not a contact surface, and the Call and WhatsApp actions live on the public profile page. There is no `rating`, `yearsExperience` or `verified` field, because none of those exist on the real schema and manufacturing them would be inventing data.')
 export const ListFeaturedProfessionalsResponse = zod.array(ListFeaturedProfessionalsResponseItem)
 
 
@@ -53,11 +228,18 @@ export const ListFeaturedProfessionalsResponse = zod.array(ListFeaturedProfessio
 export const ListFeaturedProductsResponseItem = zod.object({
   "id": zod.string(),
   "name": zod.string(),
+  "description": zod.string().nullable(),
+  "unit": zod.string().nullable(),
+  "price": zod.number().nullable().describe('Price in PKR. Null means the supplier has not published a price.'),
+  "priceLabel": zod.string().nullable().describe('Rendered fallback for a null price: "Price on request".'),
   "category": zod.string(),
+  "categoryId": zod.string(),
   "supplier": zod.string(),
+  "supplierId": zod.string(),
   "city": zod.string(),
-  "priceLabel": zod.string(),
-  "description": zod.string()
+  "location": zod.string().nullable(),
+  "imageUrl": zod.string().nullable(),
+  "featured": zod.boolean()
 })
 export const ListFeaturedProductsResponse = zod.array(ListFeaturedProductsResponseItem)
 
@@ -66,11 +248,11 @@ export const ListFeaturedProductsResponse = zod.array(ListFeaturedProductsRespon
  * @summary Get homepage discovery stats
  */
 export const GetDiscoveryStatsResponse = zod.object({
-  "marketplaceItems": zod.number().int(),
-  "professionalCategories": zod.number().int(),
-  "citiesCovered": zod.number().int(),
-  "demoNotice": zod.string()
-})
+  "marketplaceItems": zod.number().int().describe('Count of published products.'),
+  "professionalCategories": zod.number().int().describe('Count of distinct categories across real professionals.'),
+  "citiesCovered": zod.number().int().describe('Count of distinct cities across real professionals.'),
+  "demoNotice": zod.string().describe('Retained for client compatibility. No longer announces demo data, since all discovery data is now database-backed.')
+}).describe('Phase 6D: every value is a real database count. `marketplaceItems` is the number of published products. `professionalCategories` is the number of distinct `professionals.category` values. `citiesCovered` is the number of distinct `professionals.city` values, which is the narrowest reading that matches the homepage label "cities covered" sitting beside "trade categories": both describe professional coverage. `demoNotice` remains as a required string so the generated client type does not change, but it is now a plain status string rather than a warning about fictional data.')
 
 
 /**
@@ -111,7 +293,7 @@ export const FindNearbyPlacesQueryParams = zod.object({
   "latitude": zod.coerce.number().min(findNearbyPlacesQueryLatitudeMin).max(findNearbyPlacesQueryLatitudeMax),
   "longitude": zod.coerce.number().min(findNearbyPlacesQueryLongitudeMin).max(findNearbyPlacesQueryLongitudeMax),
   "radiusMeters": zod.coerce.number().int().min(findNearbyPlacesQueryRadiusMetersMin).max(findNearbyPlacesQueryRadiusMetersMax).default(findNearbyPlacesQueryRadiusMetersDefault),
-  "category": zod.coerce.string().optional().describe('Optional Buildora category filter')
+  "category": zod.coerce.string().optional().describe('Optional QadeerBuilds category filter')
 })
 
 export const FindNearbyPlacesResponse = zod.object({
@@ -144,13 +326,17 @@ export const FindNearbyPlacesResponse = zod.object({
 export const listConstructionEstimatesResponseOneLocationMin = 2;
 
 export const listConstructionEstimatesResponseOnePlotSizeExclusiveMin = 0;
+export const listConstructionEstimatesResponseOnePlotSizeMax = 250000;
 
+export const listConstructionEstimatesResponseOnePlotAreaSqFtMax = 250000;
 
 export const listConstructionEstimatesResponseOneCoveredAreaValueExclusiveMin = 0;
+export const listConstructionEstimatesResponseOneCoveredAreaValueMax = 250000;
 
 export const listConstructionEstimatesResponseOneFloorCountMax = 10;
 
 
+export const listConstructionEstimatesResponseOneTotalCoveredAreaSqFtMax = 250000;
 
 export const listConstructionEstimatesResponseOneGreyMinMin = 0;
 
@@ -172,17 +358,17 @@ export const listConstructionEstimatesResponseOneCostPerSqFtMaxMin = 0;
 
 export const ListConstructionEstimatesResponseItem = zod.object({
   "location": zod.string().min(listConstructionEstimatesResponseOneLocationMin),
-  "plotSize": zod.number().gt(listConstructionEstimatesResponseOnePlotSizeExclusiveMin),
+  "plotSize": zod.number().gt(listConstructionEstimatesResponseOnePlotSizeExclusiveMin).max(listConstructionEstimatesResponseOnePlotSizeMax),
   "plotUnit": zod.enum(['marla', 'kanal', 'squareFeet', 'squareYards']),
-  "plotAreaSqFt": zod.number().int().min(1),
+  "plotAreaSqFt": zod.number().int().min(1).max(listConstructionEstimatesResponseOnePlotAreaSqFtMax),
   "coveredAreaMode": zod.enum(['squareFeet', 'percentage']),
   "coveredAreaBasis": zod.enum(['perFloor', 'total']),
-  "coveredAreaValue": zod.number().gt(listConstructionEstimatesResponseOneCoveredAreaValueExclusiveMin),
+  "coveredAreaValue": zod.number().gt(listConstructionEstimatesResponseOneCoveredAreaValueExclusiveMin).max(listConstructionEstimatesResponseOneCoveredAreaValueMax),
   "floorCount": zod.number().int().min(1).max(listConstructionEstimatesResponseOneFloorCountMax),
   "floors": zod.string().min(1),
   "constructionType": zod.enum(['greyStructure', 'complete']),
   "quality": zod.enum(['basic', 'standard', 'premium']),
-  "totalCoveredAreaSqFt": zod.number().int().min(1),
+  "totalCoveredAreaSqFt": zod.number().int().min(1).max(listConstructionEstimatesResponseOneTotalCoveredAreaSqFtMax),
   "greyMin": zod.number().int().min(listConstructionEstimatesResponseOneGreyMinMin),
   "greyMax": zod.number().int().min(listConstructionEstimatesResponseOneGreyMaxMin),
   "finishingMin": zod.number().int().min(listConstructionEstimatesResponseOneFinishingMinMin),
@@ -204,13 +390,17 @@ export const ListConstructionEstimatesResponse = zod.array(ListConstructionEstim
 export const createConstructionEstimateBodyLocationMin = 2;
 
 export const createConstructionEstimateBodyPlotSizeExclusiveMin = 0;
+export const createConstructionEstimateBodyPlotSizeMax = 250000;
 
+export const createConstructionEstimateBodyPlotAreaSqFtMax = 250000;
 
 export const createConstructionEstimateBodyCoveredAreaValueExclusiveMin = 0;
+export const createConstructionEstimateBodyCoveredAreaValueMax = 250000;
 
 export const createConstructionEstimateBodyFloorCountMax = 10;
 
 
+export const createConstructionEstimateBodyTotalCoveredAreaSqFtMax = 250000;
 
 export const createConstructionEstimateBodyGreyMinMin = 0;
 
@@ -232,17 +422,17 @@ export const createConstructionEstimateBodyCostPerSqFtMaxMin = 0;
 
 export const CreateConstructionEstimateBody = zod.object({
   "location": zod.string().min(createConstructionEstimateBodyLocationMin),
-  "plotSize": zod.number().gt(createConstructionEstimateBodyPlotSizeExclusiveMin),
+  "plotSize": zod.number().gt(createConstructionEstimateBodyPlotSizeExclusiveMin).max(createConstructionEstimateBodyPlotSizeMax),
   "plotUnit": zod.enum(['marla', 'kanal', 'squareFeet', 'squareYards']),
-  "plotAreaSqFt": zod.number().int().min(1),
+  "plotAreaSqFt": zod.number().int().min(1).max(createConstructionEstimateBodyPlotAreaSqFtMax),
   "coveredAreaMode": zod.enum(['squareFeet', 'percentage']),
   "coveredAreaBasis": zod.enum(['perFloor', 'total']),
-  "coveredAreaValue": zod.number().gt(createConstructionEstimateBodyCoveredAreaValueExclusiveMin),
+  "coveredAreaValue": zod.number().gt(createConstructionEstimateBodyCoveredAreaValueExclusiveMin).max(createConstructionEstimateBodyCoveredAreaValueMax),
   "floorCount": zod.number().int().min(1).max(createConstructionEstimateBodyFloorCountMax),
   "floors": zod.string().min(1),
   "constructionType": zod.enum(['greyStructure', 'complete']),
   "quality": zod.enum(['basic', 'standard', 'premium']),
-  "totalCoveredAreaSqFt": zod.number().int().min(1),
+  "totalCoveredAreaSqFt": zod.number().int().min(1).max(createConstructionEstimateBodyTotalCoveredAreaSqFtMax),
   "greyMin": zod.number().int().min(createConstructionEstimateBodyGreyMinMin),
   "greyMax": zod.number().int().min(createConstructionEstimateBodyGreyMaxMin),
   "finishingMin": zod.number().int().min(createConstructionEstimateBodyFinishingMinMin),
@@ -256,13 +446,17 @@ export const CreateConstructionEstimateBody = zod.object({
 export const createConstructionEstimateResponseOneLocationMin = 2;
 
 export const createConstructionEstimateResponseOnePlotSizeExclusiveMin = 0;
+export const createConstructionEstimateResponseOnePlotSizeMax = 250000;
 
+export const createConstructionEstimateResponseOnePlotAreaSqFtMax = 250000;
 
 export const createConstructionEstimateResponseOneCoveredAreaValueExclusiveMin = 0;
+export const createConstructionEstimateResponseOneCoveredAreaValueMax = 250000;
 
 export const createConstructionEstimateResponseOneFloorCountMax = 10;
 
 
+export const createConstructionEstimateResponseOneTotalCoveredAreaSqFtMax = 250000;
 
 export const createConstructionEstimateResponseOneGreyMinMin = 0;
 
@@ -284,17 +478,17 @@ export const createConstructionEstimateResponseOneCostPerSqFtMaxMin = 0;
 
 export const CreateConstructionEstimateResponse = zod.object({
   "location": zod.string().min(createConstructionEstimateResponseOneLocationMin),
-  "plotSize": zod.number().gt(createConstructionEstimateResponseOnePlotSizeExclusiveMin),
+  "plotSize": zod.number().gt(createConstructionEstimateResponseOnePlotSizeExclusiveMin).max(createConstructionEstimateResponseOnePlotSizeMax),
   "plotUnit": zod.enum(['marla', 'kanal', 'squareFeet', 'squareYards']),
-  "plotAreaSqFt": zod.number().int().min(1),
+  "plotAreaSqFt": zod.number().int().min(1).max(createConstructionEstimateResponseOnePlotAreaSqFtMax),
   "coveredAreaMode": zod.enum(['squareFeet', 'percentage']),
   "coveredAreaBasis": zod.enum(['perFloor', 'total']),
-  "coveredAreaValue": zod.number().gt(createConstructionEstimateResponseOneCoveredAreaValueExclusiveMin),
+  "coveredAreaValue": zod.number().gt(createConstructionEstimateResponseOneCoveredAreaValueExclusiveMin).max(createConstructionEstimateResponseOneCoveredAreaValueMax),
   "floorCount": zod.number().int().min(1).max(createConstructionEstimateResponseOneFloorCountMax),
   "floors": zod.string().min(1),
   "constructionType": zod.enum(['greyStructure', 'complete']),
   "quality": zod.enum(['basic', 'standard', 'premium']),
-  "totalCoveredAreaSqFt": zod.number().int().min(1),
+  "totalCoveredAreaSqFt": zod.number().int().min(1).max(createConstructionEstimateResponseOneTotalCoveredAreaSqFtMax),
   "greyMin": zod.number().int().min(createConstructionEstimateResponseOneGreyMinMin),
   "greyMax": zod.number().int().min(createConstructionEstimateResponseOneGreyMaxMin),
   "finishingMin": zod.number().int().min(createConstructionEstimateResponseOneFinishingMinMin),
@@ -309,3 +503,558 @@ export const CreateConstructionEstimateResponse = zod.object({
 }))
 
 
+/**
+ * @summary List the signed-in user's saved project briefs
+ */
+export const listProjectBriefsResponseOneNameMax = 120;
+
+export const listProjectBriefsResponseOneLocationMin = 2;
+export const listProjectBriefsResponseOneLocationMax = 120;
+
+export const listProjectBriefsResponseOneDescriptionMax = 5000;
+
+
+
+export const ListProjectBriefsResponseItem = zod.object({
+  "name": zod.string().min(1).max(listProjectBriefsResponseOneNameMax),
+  "projectType": zod.enum(['New home', 'Renovation', 'Commercial space', 'Something else']),
+  "location": zod.string().min(listProjectBriefsResponseOneLocationMin).max(listProjectBriefsResponseOneLocationMax),
+  "budget": zod.enum(['Under PKR 5M', 'PKR 5M - 15M', 'PKR 15M - 30M', 'PKR 30M or more', 'Not sure yet']),
+  "timeline": zod.enum(['As soon as possible', 'Within 1-3 months', 'Within 3-6 months', 'Within 6-12 months', 'Just planning']),
+  "description": zod.string().min(1).max(listProjectBriefsResponseOneDescriptionMax)
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.coerce.date()
+}))
+export const ListProjectBriefsResponse = zod.array(ListProjectBriefsResponseItem)
+
+
+/**
+ * @summary Save a project brief for the signed-in user
+ */
+export const createProjectBriefBodyNameMax = 120;
+
+export const createProjectBriefBodyLocationMin = 2;
+export const createProjectBriefBodyLocationMax = 120;
+
+export const createProjectBriefBodyDescriptionMax = 5000;
+
+
+
+export const CreateProjectBriefBody = zod.object({
+  "name": zod.string().min(1).max(createProjectBriefBodyNameMax),
+  "projectType": zod.enum(['New home', 'Renovation', 'Commercial space', 'Something else']),
+  "location": zod.string().min(createProjectBriefBodyLocationMin).max(createProjectBriefBodyLocationMax),
+  "budget": zod.enum(['Under PKR 5M', 'PKR 5M - 15M', 'PKR 15M - 30M', 'PKR 30M or more', 'Not sure yet']),
+  "timeline": zod.enum(['As soon as possible', 'Within 1-3 months', 'Within 3-6 months', 'Within 6-12 months', 'Just planning']),
+  "description": zod.string().min(1).max(createProjectBriefBodyDescriptionMax)
+})
+
+export const createProjectBriefResponseOneNameMax = 120;
+
+export const createProjectBriefResponseOneLocationMin = 2;
+export const createProjectBriefResponseOneLocationMax = 120;
+
+export const createProjectBriefResponseOneDescriptionMax = 5000;
+
+
+
+export const CreateProjectBriefResponse = zod.object({
+  "name": zod.string().min(1).max(createProjectBriefResponseOneNameMax),
+  "projectType": zod.enum(['New home', 'Renovation', 'Commercial space', 'Something else']),
+  "location": zod.string().min(createProjectBriefResponseOneLocationMin).max(createProjectBriefResponseOneLocationMax),
+  "budget": zod.enum(['Under PKR 5M', 'PKR 5M - 15M', 'PKR 15M - 30M', 'PKR 30M or more', 'Not sure yet']),
+  "timeline": zod.enum(['As soon as possible', 'Within 1-3 months', 'Within 3-6 months', 'Within 6-12 months', 'Just planning']),
+  "description": zod.string().min(1).max(createProjectBriefResponseOneDescriptionMax)
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.coerce.date()
+}))
+
+
+/**
+ * @summary List public professional profiles
+ */
+export const listPublicProfessionalsQueryQueryMax = 120;
+
+export const listPublicProfessionalsQueryCityMax = 120;
+
+export const listPublicProfessionalsQueryLocationMax = 200;
+
+export const listPublicProfessionalsQueryCategoryMax = 80;
+
+export const listPublicProfessionalsQueryServicesMax = 200;
+
+
+
+export const ListPublicProfessionalsQueryParams = zod.object({
+  "query": zod.coerce.string().max(listPublicProfessionalsQueryQueryMax).optional().describe('Free-text search across name, profession, category, services, city and area. Multi-word queries match all words, and small spelling differences are tolerated when no exact match exists.'),
+  "city": zod.coerce.string().max(listPublicProfessionalsQueryCityMax).optional().describe('Filter by city'),
+  "location": zod.coerce.string().max(listPublicProfessionalsQueryLocationMax).optional().describe('Filter by area or location'),
+  "category": zod.coerce.string().max(listPublicProfessionalsQueryCategoryMax).optional().describe('Filter by trade category'),
+  "services": zod.coerce.string().max(listPublicProfessionalsQueryServicesMax).optional().describe('Filter by offered services')
+})
+
+export const ListPublicProfessionalsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "profession": zod.string(),
+  "category": zod.string(),
+  "services": zod.string(),
+  "city": zod.string(),
+  "location": zod.string().nullable(),
+  "logoUrl": zod.string().nullable(),
+  "phone": zod.string().nullable().describe('Public contact number, entered by the professional on their own profile. Used for the Call now action.'),
+  "whatsapp": zod.string().nullable().describe('Public WhatsApp number, entered by the professional on their own profile. Used for the WhatsApp action.')
+})
+export const ListPublicProfessionalsResponse = zod.array(ListPublicProfessionalsResponseItem)
+
+
+/**
+ * @summary Create the signed-in user's professional profile
+ */
+export const createProfessionalBodyNameMin = 2;
+export const createProfessionalBodyNameMax = 120;
+
+export const createProfessionalBodyProfessionMin = 2;
+export const createProfessionalBodyProfessionMax = 80;
+
+export const createProfessionalBodyCategoryMin = 2;
+export const createProfessionalBodyCategoryMax = 80;
+
+export const createProfessionalBodyServicesMin = 2;
+export const createProfessionalBodyServicesMax = 1000;
+
+export const createProfessionalBodyBioMax = 2000;
+
+export const createProfessionalBodyCityMin = 2;
+export const createProfessionalBodyCityMax = 120;
+
+export const createProfessionalBodyLocationMax = 200;
+
+export const createProfessionalBodyLogoUrlMax = 2048;
+
+export const createProfessionalBodyPhoneMax = 32;
+
+export const createProfessionalBodyWhatsappMax = 32;
+
+
+
+export const CreateProfessionalBody = zod.object({
+  "name": zod.string().min(createProfessionalBodyNameMin).max(createProfessionalBodyNameMax),
+  "profession": zod.string().min(createProfessionalBodyProfessionMin).max(createProfessionalBodyProfessionMax),
+  "category": zod.string().min(createProfessionalBodyCategoryMin).max(createProfessionalBodyCategoryMax),
+  "services": zod.string().min(createProfessionalBodyServicesMin).max(createProfessionalBodyServicesMax),
+  "bio": zod.string().max(createProfessionalBodyBioMax).optional(),
+  "city": zod.string().min(createProfessionalBodyCityMin).max(createProfessionalBodyCityMax),
+  "location": zod.string().max(createProfessionalBodyLocationMax).optional(),
+  "logoUrl": zod.string().max(createProfessionalBodyLogoUrlMax).optional().describe('Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.'),
+  "phone": zod.string().max(createProfessionalBodyPhoneMax).optional(),
+  "whatsapp": zod.string().max(createProfessionalBodyWhatsappMax).optional()
+})
+
+export const createProfessionalResponseOneNameMin = 2;
+export const createProfessionalResponseOneNameMax = 120;
+
+export const createProfessionalResponseOneProfessionMin = 2;
+export const createProfessionalResponseOneProfessionMax = 80;
+
+export const createProfessionalResponseOneCategoryMin = 2;
+export const createProfessionalResponseOneCategoryMax = 80;
+
+export const createProfessionalResponseOneServicesMin = 2;
+export const createProfessionalResponseOneServicesMax = 1000;
+
+export const createProfessionalResponseOneBioMax = 2000;
+
+export const createProfessionalResponseOneCityMin = 2;
+export const createProfessionalResponseOneCityMax = 120;
+
+export const createProfessionalResponseOneLocationMax = 200;
+
+export const createProfessionalResponseOneLogoUrlMax = 2048;
+
+export const createProfessionalResponseOnePhoneMax = 32;
+
+export const createProfessionalResponseOneWhatsappMax = 32;
+
+
+
+export const CreateProfessionalResponse = zod.object({
+  "name": zod.string().min(createProfessionalResponseOneNameMin).max(createProfessionalResponseOneNameMax),
+  "profession": zod.string().min(createProfessionalResponseOneProfessionMin).max(createProfessionalResponseOneProfessionMax),
+  "category": zod.string().min(createProfessionalResponseOneCategoryMin).max(createProfessionalResponseOneCategoryMax),
+  "services": zod.string().min(createProfessionalResponseOneServicesMin).max(createProfessionalResponseOneServicesMax),
+  "bio": zod.string().max(createProfessionalResponseOneBioMax).optional(),
+  "city": zod.string().min(createProfessionalResponseOneCityMin).max(createProfessionalResponseOneCityMax),
+  "location": zod.string().max(createProfessionalResponseOneLocationMax).optional(),
+  "logoUrl": zod.string().max(createProfessionalResponseOneLogoUrlMax).optional().describe('Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.'),
+  "phone": zod.string().max(createProfessionalResponseOnePhoneMax).optional(),
+  "whatsapp": zod.string().max(createProfessionalResponseOneWhatsappMax).optional()
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+/**
+ * @summary Get one public professional profile
+ */
+export const GetPublicProfessionalParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetPublicProfessionalResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "profession": zod.string(),
+  "category": zod.string(),
+  "services": zod.string(),
+  "city": zod.string(),
+  "location": zod.string().nullable(),
+  "logoUrl": zod.string().nullable(),
+  "phone": zod.string().nullable().describe('Public contact number, entered by the professional on their own profile. Used for the Call now action.'),
+  "whatsapp": zod.string().nullable().describe('Public WhatsApp number, entered by the professional on their own profile. Used for the WhatsApp action.')
+})
+
+
+/**
+ * @summary Get the signed-in user's professional profile
+ */
+export const getMyProfessionalResponseOneNameMin = 2;
+export const getMyProfessionalResponseOneNameMax = 120;
+
+export const getMyProfessionalResponseOneProfessionMin = 2;
+export const getMyProfessionalResponseOneProfessionMax = 80;
+
+export const getMyProfessionalResponseOneCategoryMin = 2;
+export const getMyProfessionalResponseOneCategoryMax = 80;
+
+export const getMyProfessionalResponseOneServicesMin = 2;
+export const getMyProfessionalResponseOneServicesMax = 1000;
+
+export const getMyProfessionalResponseOneBioMax = 2000;
+
+export const getMyProfessionalResponseOneCityMin = 2;
+export const getMyProfessionalResponseOneCityMax = 120;
+
+export const getMyProfessionalResponseOneLocationMax = 200;
+
+export const getMyProfessionalResponseOneLogoUrlMax = 2048;
+
+export const getMyProfessionalResponseOnePhoneMax = 32;
+
+export const getMyProfessionalResponseOneWhatsappMax = 32;
+
+
+
+export const GetMyProfessionalResponse = zod.object({
+  "name": zod.string().min(getMyProfessionalResponseOneNameMin).max(getMyProfessionalResponseOneNameMax),
+  "profession": zod.string().min(getMyProfessionalResponseOneProfessionMin).max(getMyProfessionalResponseOneProfessionMax),
+  "category": zod.string().min(getMyProfessionalResponseOneCategoryMin).max(getMyProfessionalResponseOneCategoryMax),
+  "services": zod.string().min(getMyProfessionalResponseOneServicesMin).max(getMyProfessionalResponseOneServicesMax),
+  "bio": zod.string().max(getMyProfessionalResponseOneBioMax).optional(),
+  "city": zod.string().min(getMyProfessionalResponseOneCityMin).max(getMyProfessionalResponseOneCityMax),
+  "location": zod.string().max(getMyProfessionalResponseOneLocationMax).optional(),
+  "logoUrl": zod.string().max(getMyProfessionalResponseOneLogoUrlMax).optional().describe('Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.'),
+  "phone": zod.string().max(getMyProfessionalResponseOnePhoneMax).optional(),
+  "whatsapp": zod.string().max(getMyProfessionalResponseOneWhatsappMax).optional()
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+/**
+ * @summary Update the signed-in user's professional profile
+ */
+export const updateMyProfessionalBodyNameMin = 2;
+export const updateMyProfessionalBodyNameMax = 120;
+
+export const updateMyProfessionalBodyProfessionMin = 2;
+export const updateMyProfessionalBodyProfessionMax = 80;
+
+export const updateMyProfessionalBodyCategoryMin = 2;
+export const updateMyProfessionalBodyCategoryMax = 80;
+
+export const updateMyProfessionalBodyServicesMin = 2;
+export const updateMyProfessionalBodyServicesMax = 1000;
+
+export const updateMyProfessionalBodyBioMax = 2000;
+
+export const updateMyProfessionalBodyCityMin = 2;
+export const updateMyProfessionalBodyCityMax = 120;
+
+export const updateMyProfessionalBodyLocationMax = 200;
+
+export const updateMyProfessionalBodyLogoUrlMax = 2048;
+
+export const updateMyProfessionalBodyPhoneMax = 32;
+
+export const updateMyProfessionalBodyWhatsappMax = 32;
+
+
+
+export const UpdateMyProfessionalBody = zod.object({
+  "name": zod.string().min(updateMyProfessionalBodyNameMin).max(updateMyProfessionalBodyNameMax).optional(),
+  "profession": zod.string().min(updateMyProfessionalBodyProfessionMin).max(updateMyProfessionalBodyProfessionMax).optional(),
+  "category": zod.string().min(updateMyProfessionalBodyCategoryMin).max(updateMyProfessionalBodyCategoryMax).optional(),
+  "services": zod.string().min(updateMyProfessionalBodyServicesMin).max(updateMyProfessionalBodyServicesMax).optional(),
+  "bio": zod.string().max(updateMyProfessionalBodyBioMax).optional(),
+  "city": zod.string().min(updateMyProfessionalBodyCityMin).max(updateMyProfessionalBodyCityMax).optional(),
+  "location": zod.string().max(updateMyProfessionalBodyLocationMax).optional(),
+  "logoUrl": zod.string().max(updateMyProfessionalBodyLogoUrlMax).optional().describe('Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.'),
+  "phone": zod.string().max(updateMyProfessionalBodyPhoneMax).optional(),
+  "whatsapp": zod.string().max(updateMyProfessionalBodyWhatsappMax).optional()
+})
+
+export const updateMyProfessionalResponseOneNameMin = 2;
+export const updateMyProfessionalResponseOneNameMax = 120;
+
+export const updateMyProfessionalResponseOneProfessionMin = 2;
+export const updateMyProfessionalResponseOneProfessionMax = 80;
+
+export const updateMyProfessionalResponseOneCategoryMin = 2;
+export const updateMyProfessionalResponseOneCategoryMax = 80;
+
+export const updateMyProfessionalResponseOneServicesMin = 2;
+export const updateMyProfessionalResponseOneServicesMax = 1000;
+
+export const updateMyProfessionalResponseOneBioMax = 2000;
+
+export const updateMyProfessionalResponseOneCityMin = 2;
+export const updateMyProfessionalResponseOneCityMax = 120;
+
+export const updateMyProfessionalResponseOneLocationMax = 200;
+
+export const updateMyProfessionalResponseOneLogoUrlMax = 2048;
+
+export const updateMyProfessionalResponseOnePhoneMax = 32;
+
+export const updateMyProfessionalResponseOneWhatsappMax = 32;
+
+
+
+export const UpdateMyProfessionalResponse = zod.object({
+  "name": zod.string().min(updateMyProfessionalResponseOneNameMin).max(updateMyProfessionalResponseOneNameMax),
+  "profession": zod.string().min(updateMyProfessionalResponseOneProfessionMin).max(updateMyProfessionalResponseOneProfessionMax),
+  "category": zod.string().min(updateMyProfessionalResponseOneCategoryMin).max(updateMyProfessionalResponseOneCategoryMax),
+  "services": zod.string().min(updateMyProfessionalResponseOneServicesMin).max(updateMyProfessionalResponseOneServicesMax),
+  "bio": zod.string().max(updateMyProfessionalResponseOneBioMax).optional(),
+  "city": zod.string().min(updateMyProfessionalResponseOneCityMin).max(updateMyProfessionalResponseOneCityMax),
+  "location": zod.string().max(updateMyProfessionalResponseOneLocationMax).optional(),
+  "logoUrl": zod.string().max(updateMyProfessionalResponseOneLogoUrlMax).optional().describe('Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.'),
+  "phone": zod.string().max(updateMyProfessionalResponseOnePhoneMax).optional(),
+  "whatsapp": zod.string().max(updateMyProfessionalResponseOneWhatsappMax).optional()
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+/**
+ * @summary List the signed-in professional's portfolio projects
+ */
+export const listMyProfessionalProjectsResponseOneTitleMin = 2;
+export const listMyProfessionalProjectsResponseOneTitleMax = 160;
+
+export const listMyProfessionalProjectsResponseOneDescriptionMax = 2000;
+
+export const listMyProfessionalProjectsResponseOneLocationMax = 200;
+
+export const listMyProfessionalProjectsResponseOneImageUrlMax = 2048;
+
+
+
+export const ListMyProfessionalProjectsResponseItem = zod.object({
+  "title": zod.string().min(listMyProfessionalProjectsResponseOneTitleMin).max(listMyProfessionalProjectsResponseOneTitleMax).optional(),
+  "description": zod.string().max(listMyProfessionalProjectsResponseOneDescriptionMax).optional(),
+  "location": zod.string().max(listMyProfessionalProjectsResponseOneLocationMax).optional(),
+  "imageUrl": zod.string().max(listMyProfessionalProjectsResponseOneImageUrlMax).optional().describe('Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.')
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+export const ListMyProfessionalProjectsResponse = zod.array(ListMyProfessionalProjectsResponseItem)
+
+
+/**
+ * @summary Add a portfolio project to the signed-in professional
+ */
+export const createMyProfessionalProjectBodyTitleMin = 2;
+export const createMyProfessionalProjectBodyTitleMax = 160;
+
+export const createMyProfessionalProjectBodyDescriptionMax = 2000;
+
+export const createMyProfessionalProjectBodyLocationMax = 200;
+
+export const createMyProfessionalProjectBodyImageUrlMax = 2048;
+
+
+
+export const CreateMyProfessionalProjectBody = zod.object({
+  "title": zod.string().min(createMyProfessionalProjectBodyTitleMin).max(createMyProfessionalProjectBodyTitleMax).optional(),
+  "description": zod.string().max(createMyProfessionalProjectBodyDescriptionMax).optional(),
+  "location": zod.string().max(createMyProfessionalProjectBodyLocationMax).optional(),
+  "imageUrl": zod.string().max(createMyProfessionalProjectBodyImageUrlMax).optional().describe('Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.')
+})
+
+export const createMyProfessionalProjectResponseOneTitleMin = 2;
+export const createMyProfessionalProjectResponseOneTitleMax = 160;
+
+export const createMyProfessionalProjectResponseOneDescriptionMax = 2000;
+
+export const createMyProfessionalProjectResponseOneLocationMax = 200;
+
+export const createMyProfessionalProjectResponseOneImageUrlMax = 2048;
+
+
+
+export const CreateMyProfessionalProjectResponse = zod.object({
+  "title": zod.string().min(createMyProfessionalProjectResponseOneTitleMin).max(createMyProfessionalProjectResponseOneTitleMax).optional(),
+  "description": zod.string().max(createMyProfessionalProjectResponseOneDescriptionMax).optional(),
+  "location": zod.string().max(createMyProfessionalProjectResponseOneLocationMax).optional(),
+  "imageUrl": zod.string().max(createMyProfessionalProjectResponseOneImageUrlMax).optional().describe('Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.')
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+/**
+ * @summary Update one of the signed-in professional's portfolio projects
+ */
+export const UpdateMyProfessionalProjectParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const updateMyProfessionalProjectBodyTitleMin = 2;
+export const updateMyProfessionalProjectBodyTitleMax = 160;
+
+export const updateMyProfessionalProjectBodyDescriptionMax = 2000;
+
+export const updateMyProfessionalProjectBodyLocationMax = 200;
+
+export const updateMyProfessionalProjectBodyImageUrlMax = 2048;
+
+
+
+export const UpdateMyProfessionalProjectBody = zod.object({
+  "title": zod.string().min(updateMyProfessionalProjectBodyTitleMin).max(updateMyProfessionalProjectBodyTitleMax).optional(),
+  "description": zod.string().max(updateMyProfessionalProjectBodyDescriptionMax).optional(),
+  "location": zod.string().max(updateMyProfessionalProjectBodyLocationMax).optional(),
+  "imageUrl": zod.string().max(updateMyProfessionalProjectBodyImageUrlMax).optional().describe('Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.')
+})
+
+export const updateMyProfessionalProjectResponseOneTitleMin = 2;
+export const updateMyProfessionalProjectResponseOneTitleMax = 160;
+
+export const updateMyProfessionalProjectResponseOneDescriptionMax = 2000;
+
+export const updateMyProfessionalProjectResponseOneLocationMax = 200;
+
+export const updateMyProfessionalProjectResponseOneImageUrlMax = 2048;
+
+
+
+export const UpdateMyProfessionalProjectResponse = zod.object({
+  "title": zod.string().min(updateMyProfessionalProjectResponseOneTitleMin).max(updateMyProfessionalProjectResponseOneTitleMax).optional(),
+  "description": zod.string().max(updateMyProfessionalProjectResponseOneDescriptionMax).optional(),
+  "location": zod.string().max(updateMyProfessionalProjectResponseOneLocationMax).optional(),
+  "imageUrl": zod.string().max(updateMyProfessionalProjectResponseOneImageUrlMax).optional().describe('Optional absolute http or https image URL. Non-http(s) schemes such as javascript and data URIs are rejected.')
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+/**
+ * @summary Delete one of the signed-in professional's portfolio projects
+ */
+export const DeleteMyProfessionalProjectParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const DeleteMyProfessionalProjectResponse = zod.void()
+
+
+/**
+ * @summary List quote requests sent to the signed-in professional
+ */
+export const ListMyQuoteRequestsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "size": zod.string(),
+  "details": zod.string(),
+  "imageUrls": zod.array(zod.string()),
+  "createdAt": zod.coerce.date()
+})
+export const ListMyQuoteRequestsResponse = zod.array(ListMyQuoteRequestsResponseItem)
+
+
+/**
+ * @summary Send a quote request to a professional
+ */
+export const CreateProfessionalQuoteRequestParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const createProfessionalQuoteRequestBodyNameMin = 2;
+export const createProfessionalQuoteRequestBodyNameMax = 120;
+
+export const createProfessionalQuoteRequestBodyEmailMax = 254;
+
+export const createProfessionalQuoteRequestBodySizeMin = 2;
+export const createProfessionalQuoteRequestBodySizeMax = 120;
+
+export const createProfessionalQuoteRequestBodyDetailsMin = 2;
+export const createProfessionalQuoteRequestBodyDetailsMax = 2000;
+
+export const createProfessionalQuoteRequestBodyImageUrlsItemMax = 2048;
+
+export const createProfessionalQuoteRequestBodyImageUrlsMax = 5;
+
+
+
+export const CreateProfessionalQuoteRequestBody = zod.object({
+  "name": zod.string().min(createProfessionalQuoteRequestBodyNameMin).max(createProfessionalQuoteRequestBodyNameMax),
+  "email": zod.string().email().max(createProfessionalQuoteRequestBodyEmailMax),
+  "size": zod.string().min(createProfessionalQuoteRequestBodySizeMin).max(createProfessionalQuoteRequestBodySizeMax),
+  "details": zod.string().min(createProfessionalQuoteRequestBodyDetailsMin).max(createProfessionalQuoteRequestBodyDetailsMax),
+  "imageUrls": zod.array(zod.string().max(createProfessionalQuoteRequestBodyImageUrlsItemMax)).max(createProfessionalQuoteRequestBodyImageUrlsMax).optional().describe('Optional absolute http or https image URLs, up to five. Non-http(s) schemes such as javascript and data URIs are rejected.')
+})
+
+export const CreateProfessionalQuoteRequestResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "size": zod.string(),
+  "details": zod.string(),
+  "imageUrls": zod.array(zod.string()),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List a professional's public portfolio projects
+ */
+export const ListPublicProfessionalProjectsParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const ListPublicProfessionalProjectsResponseItem = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().nullable(),
+  "location": zod.string().nullable(),
+  "imageUrl": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+})
+export const ListPublicProfessionalProjectsResponse = zod.array(ListPublicProfessionalProjectsResponseItem)

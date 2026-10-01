@@ -23,7 +23,7 @@ longitude: number;
  */
 radiusMeters?: number;
 /**
- * Optional Buildora category filter
+ * Optional QadeerBuilds category filter
  */
 category?: string;
 };
