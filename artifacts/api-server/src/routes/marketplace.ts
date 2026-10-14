@@ -26,8 +26,8 @@ import {
   queryString,
   rankByTypo,
   searchTokens,
-} from "../lib/search";
-import { isUuid } from "../lib/validation";
+} from "../lib/search.js";
+import { isUuid } from "../lib/validation.js";
 
 const router: IRouter = Router();
 

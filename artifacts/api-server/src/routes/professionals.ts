@@ -16,14 +16,14 @@ import {
   professionals,
   type ProfessionalRow,
 } from "@workspace/db/schema";
-import { isUuid } from "../lib/validation";
+import { isUuid } from "../lib/validation.js";
 import {
   containsPattern,
   presentFields,
   queryString,
   rankByTypo,
   searchTokens,
-} from "../lib/search";
+} from "../lib/search.js";
 
 const router: IRouter = Router();
 const PUBLIC_PROFESSIONAL_LIMIT = 100;

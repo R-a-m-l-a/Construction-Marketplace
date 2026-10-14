@@ -21,7 +21,7 @@ import {
   type ProfessionalProjectRow,
   type ProfessionalQuoteRequestRow,
 } from "@workspace/db/schema";
-import { isUuid } from "../lib/validation";
+import { isUuid } from "../lib/validation.js";
 
 const router: IRouter = Router();
 
