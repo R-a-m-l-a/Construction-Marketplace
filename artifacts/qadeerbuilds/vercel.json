@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://construction-marketplace-8mzvbkuo7-r-a-m-l-as-projects.vercel.app/api/:path*"
+      "destination": "https://construction-marketplace-delta.vercel.app/api/:path*"
     },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
