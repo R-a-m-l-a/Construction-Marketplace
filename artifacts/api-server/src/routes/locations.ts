@@ -298,46 +298,47 @@ function mapOverpassElements(
   category?: string,
 ): PlaceRow[] {
   const seen = new Set<string>();
+  const places: PlaceRow[] = [];
 
-  return elements
-    .map((element) => {
-      const tags = element.tags ?? {};
-      const name = tags.name ?? tags.brand ?? tags.operator;
-      const placeLatitude = element.lat ?? element.center?.lat;
-      const placeLongitude = element.lon ?? element.center?.lon;
-      const placeCategory = categoryFor(tags);
+  for (const element of elements) {
+    const tags = element.tags ?? {};
+    const name = tags.name ?? tags.brand ?? tags.operator;
+    const placeLatitude = element.lat ?? element.center?.lat;
+    const placeLongitude = element.lon ?? element.center?.lon;
+    const placeCategory = categoryFor(tags);
 
-      if (
-        !name ||
-        !placeCategory ||
-        placeLatitude === undefined ||
-        placeLongitude === undefined ||
-        element.id === undefined ||
-        !element.type
-      ) {
-        return null;
-      }
+    if (
+      !name ||
+      !placeCategory ||
+      placeLatitude === undefined ||
+      placeLongitude === undefined ||
+      element.id === undefined ||
+      !element.type
+    ) {
+      continue;
+    }
 
-      const id = `${element.type}-${element.id}`;
-      if (seen.has(id)) return null;
-      seen.add(id);
+    const id = `${element.type}-${element.id}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
 
-      return {
-        id,
-        name,
-        category: placeCategory,
-        latitude: placeLatitude,
-        longitude: placeLongitude,
-        distanceKm: Number(
-          haversineKm(latitude, longitude, placeLatitude, placeLongitude).toFixed(1),
-        ),
-        address: addressFor(tags),
-        phone: tags.phone ?? tags["contact:phone"] ?? null,
-        website: tags.website ?? tags["contact:website"] ?? null,
-        osmUrl: `https://www.openstreetmap.org/${element.type}/${element.id}`,
-      };
-    })
-    .filter((place): place is PlaceRow => place !== null)
+    places.push({
+      id,
+      name,
+      category: placeCategory,
+      latitude: placeLatitude,
+      longitude: placeLongitude,
+      distanceKm: Number(
+        haversineKm(latitude, longitude, placeLatitude, placeLongitude).toFixed(1),
+      ),
+      address: addressFor(tags),
+      phone: tags.phone ?? tags["contact:phone"] ?? null,
+      website: tags.website ?? tags["contact:website"] ?? null,
+      osmUrl: `https://www.openstreetmap.org/${element.type}/${element.id}`,
+    });
+  }
+
+  return places
     .filter((place) => !category || place.category === category)
     .sort((first, second) => first.distanceKm - second.distanceKm)
     .slice(0, 80);
@@ -362,21 +363,23 @@ function fallbackPlaces(
 
   if (!best || bestDistance > 80) return [];
 
-  return best.places
-    .map((place, index) => ({
-      id: `fallback-${best!.city}-${index}`,
-      name: place.name,
-      category: place.category,
-      latitude: place.latitude,
-      longitude: place.longitude,
-      distanceKm: Number(
-        haversineKm(latitude, longitude, place.latitude, place.longitude).toFixed(1),
-      ),
-      address: place.address ?? null,
-      phone: null,
-      website: null,
-      osmUrl: null,
-    }))
+  const selected = best;
+  const places: PlaceRow[] = selected.places.map((place, index) => ({
+    id: `fallback-${selected.city}-${index}`,
+    name: place.name,
+    category: place.category,
+    latitude: place.latitude,
+    longitude: place.longitude,
+    distanceKm: Number(
+      haversineKm(latitude, longitude, place.latitude, place.longitude).toFixed(1),
+    ),
+    address: place.address ?? null,
+    phone: null,
+    website: null,
+    osmUrl: null,
+  }));
+
+  return places
     .filter((place) => !category || place.category === category)
     .sort((a, b) => a.distanceKm - b.distanceKm);
 }
