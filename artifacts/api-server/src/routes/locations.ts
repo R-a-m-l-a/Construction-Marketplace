@@ -485,7 +485,21 @@ out center tags;`;
 
   try {
     const elements = await queryOverpass(overpassQuery);
-    const places = mapOverpassElements(elements, latitude, longitude, category);
+    let places = mapOverpassElements(elements, latitude, longitude, category);
+    let source = "OpenStreetMap Overpass";
+    let sourceNotice = SOURCE_NOTICE;
+
+    // Overpass often returns an empty list for Pakistan (thin OSM tags or
+    // a mirror that replies 200 with no elements). Prefer curated starting
+    // points so the map is never blank in major cities.
+    if (places.length === 0) {
+      const fallback = fallbackPlaces(latitude, longitude, category);
+      if (fallback.length > 0) {
+        places = fallback;
+        source = "QadeerBuilds curated fallback";
+        sourceNotice = FALLBACK_NOTICE;
+      }
+    }
 
     res.json(
       FindNearbyPlacesResponse.parse({
@@ -496,8 +510,8 @@ out center tags;`;
           source: "QadeerBuilds map search",
         },
         places,
-        source: "OpenStreetMap Overpass",
-        sourceNotice: SOURCE_NOTICE,
+        source,
+        sourceNotice,
       }),
     );
   } catch (error) {
